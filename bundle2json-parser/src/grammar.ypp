@@ -1,0 +1,56 @@
+%{
+#include <iostream>
+#include <map>
+#include <string>
+#include "parserlib.h"
+
+#define YYSTYPE std::string
+
+int yylex(void);
+int yyerror(char* msg);
+
+BundleContainer container;
+
+%}
+
+%token KW_DEFINE KW_EXECUTION KW_SEND KW_FROM KW_TO KW_RUN KW_ON KW_RANKS
+
+%token VARIABLE DIGIT
+
+%token LCB RCB LSB RSB
+
+%token EQUAL SEMICOLON BUCK
+
+%%
+input: KW_DEFINE LCB define_context RCB KW_EXECUTION LCB execution_context RCB
+     | KW_EXECUTION LCB execution_context RCB
+     ;
+
+define_context: const_def | define_context const_def;
+
+const_def: VARIABLE EQUAL DIGIT SEMICOLON {
+     container.getDefines().insert(std::make_pair($1, $3));
+};
+
+execution_context: execution_subblock | execution_context execution_subblock;
+
+execution_subblock: run_block | send_block;
+
+send_block: KW_SEND VARIABLE KW_FROM DIGIT KW_TO DIGIT SEMICOLON {
+     SendSubblock * block = new SendSubblock();
+     block->setDFName($2);
+     block->setFromRank(std::stoi($4));
+     block->setToRank(std::stoi($6));
+     container.getExecuteBlocks().push_back(block);
+};
+
+run_block: KW_RUN task_name KW_ON KW_RANKS DIGIT SEMICOLON {
+     RunSubblock * block = new RunSubblock();
+     block->setTask($2);
+     block->setRank(std::stoi($5));
+     container.getExecuteBlocks().push_back(block);
+};
+
+task_name: VARIABLE | VARIABLE LSB DIGIT RSB;
+
+%%

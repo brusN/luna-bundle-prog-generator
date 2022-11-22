@@ -1,0 +1,52 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+
+		// Build grammar
+		{
+			"type":"shell",
+			"label": "flex-bison-build",
+			"command": "/usr/bin/bash",
+			"args": [
+				"./scripts/build.sh"
+			]
+		},
+
+		// Build parser
+		{
+			"type": "cppbuild",
+			"label": "Build",
+			"command": "/usr/bin/g++",
+			"args": [
+
+				// Debug on
+				"-g",
+				
+				// Build src
+				"${workspaceFolder}/src/parser.cpp",
+				"${workspaceFolder}/src/parserlib.cpp",
+				"${workspaceFolder}/src/jsonhandler.cpp",
+				"${workspaceFolder}/src/grammar.cpp",
+				"${workspaceFolder}/src/lexer.c",
+
+				// Output bin
+				"-o",
+				"${workspaceFolder}/bin/parser"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"flex-bison-build"
+			  ],
+			"detail": "компилятор: /usr/bin/gcc",
+		}
+	]
+}
