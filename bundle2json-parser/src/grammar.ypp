@@ -24,6 +24,9 @@ BundleContainer container;
 %%
 input: KW_DEFINE LCB define_context RCB KW_EXECUTION LCB execution_context RCB
      | KW_EXECUTION LCB execution_context RCB
+     | KW_DEFINE LCB RCB KW_EXECUTION LCB execution_context RCB
+     | KW_DEFINE LCB define_context RCB KW_EXECUTION LCB RCB
+     | KW_DEFINE LCB RCB KW_EXECUTION LCB RCB
      ;
 
 define_context: const_def | define_context const_def;

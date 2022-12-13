@@ -1,0 +1,8 @@
+venv/
+.idea/
+
+build/
+files/
+mpi_src.cpp
+
+src/__pycache__/
