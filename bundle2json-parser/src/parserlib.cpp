@@ -19,7 +19,7 @@ void RunSubblock::setTask(std::string task) {
 std::string RunSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"run\"," + 
-                                            "\"rank\": \"" + std::to_string(rank) + "\"," + 
+                                            "\"rank\": " + std::to_string(rank) + "," + 
                                             "\"cfs\": \"" + task + "\"" +
                                         "}";
     return buildString;
@@ -53,9 +53,22 @@ std::string SendSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"send\"," + 
                                             "\"data\": \"" + dfName + "\"," + 
-                                            "\"from\": \"" + std::to_string(fromRank) + "\"," +
-                                            "\"to\": \"" + std::to_string(toRank) + "\""
-                                "}";
+                                            "\"from\": " + std::to_string(fromRank) + "," +
+                                            "\"to\": " + std::to_string(toRank) + 
+                                            "}";
+    return buildString;
+}
+
+std::string DefineDataFragmentBlock::getName() {
+    return name;
+}
+
+void DefineDataFragmentBlock::setName(std::string name) {
+    this->name = name;
+}
+
+std::string DefineDataFragmentBlock::toJSONStruct() {
+    std::string buildString = std::string("{\"type\": \"df\", \"name\": \"" + name + "\"}");
     return buildString;
 }
 

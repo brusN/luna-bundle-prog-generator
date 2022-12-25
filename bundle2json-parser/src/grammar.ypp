@@ -13,7 +13,7 @@ BundleContainer container;
 
 %}
 
-%token KW_DEFINE KW_EXECUTION KW_SEND KW_FROM KW_TO KW_RUN KW_ON KW_RANKS
+%token KW_DEFINE KW_EXECUTION KW_SEND KW_FROM KW_TO KW_RUN KW_ON KW_RANKS KW_DF
 
 %token VARIABLE DIGIT
 
@@ -37,7 +37,7 @@ const_def: VARIABLE EQUAL DIGIT SEMICOLON {
 
 execution_context: execution_subblock | execution_context execution_subblock;
 
-execution_subblock: run_block | send_block;
+execution_subblock: run_block | send_block | define_df_block;
 
 send_block: KW_SEND VARIABLE KW_FROM DIGIT KW_TO DIGIT SEMICOLON {
      SendSubblock * block = new SendSubblock();
@@ -51,6 +51,12 @@ run_block: KW_RUN task_name KW_ON KW_RANKS DIGIT SEMICOLON {
      RunSubblock * block = new RunSubblock();
      block->setTask($2);
      block->setRank(std::stoi($5));
+     container.getExecuteBlocks().push_back(block);
+};
+
+define_df_block: KW_DEFINE KW_DF VARIABLE SEMICOLON {
+     DefineDataFragmentBlock * block = new DefineDataFragmentBlock();
+     block->setName($3);
      container.getExecuteBlocks().push_back(block);
 };
 

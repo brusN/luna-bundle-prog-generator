@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
 #include <string>
 
 // Inteface for subblock bodies
@@ -44,7 +45,21 @@ public:
     std::string toJSONStruct();
 };
 
-// Main container in bundle
+enum DFType {
+    DF_INT, DF_DOUBLE, DF_STRING, DF_NAME, DF_VALUE
+};
+
+class DefineDataFragmentBlock: public IExecuteSubblock {
+private:
+    std::string name;
+
+public:
+    std::string getName();
+    void setName(std::string name);
+
+    std::string toJSONStruct();
+};
+
 class BundleContainer {
 private:
     std::map<std::string, std::string> defines;

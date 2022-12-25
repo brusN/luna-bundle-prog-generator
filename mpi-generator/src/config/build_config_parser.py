@@ -1,7 +1,10 @@
 import argparse
 import json
 import os
-import logging
+
+
+class PropertyNotDefinedError(RuntimeError):
+    pass
 
 
 class BuildConfig:
@@ -82,7 +85,3 @@ class BuildConfigParser:
                 raise FileExistsError('Config file not found! Check passed config file path')
             config_json_file = open(args.config_file_path, 'r')
             return cls.__get_build_config_from_file(config_json_file, build_config)
-
-
-class PropertyNotDefinedError(RuntimeError):
-    pass

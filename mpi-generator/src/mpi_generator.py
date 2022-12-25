@@ -1,5 +1,5 @@
-from build_config_parser import *
-from mpi_builder import *
+from src.config.build_config_parser import *
+from src.builder.mpi_program_builder import *
 
 logging.basicConfig(level=logging.DEBUG)
 

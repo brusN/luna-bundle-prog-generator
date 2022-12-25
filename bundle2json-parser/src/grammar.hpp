@@ -62,15 +62,16 @@ extern int yydebug;
     KW_RUN = 263,                  /* KW_RUN  */
     KW_ON = 264,                   /* KW_ON  */
     KW_RANKS = 265,                /* KW_RANKS  */
-    VARIABLE = 266,                /* VARIABLE  */
-    DIGIT = 267,                   /* DIGIT  */
-    LCB = 268,                     /* LCB  */
-    RCB = 269,                     /* RCB  */
-    LSB = 270,                     /* LSB  */
-    RSB = 271,                     /* RSB  */
-    EQUAL = 272,                   /* EQUAL  */
-    SEMICOLON = 273,               /* SEMICOLON  */
-    BUCK = 274                     /* BUCK  */
+    KW_DF = 266,                   /* KW_DF  */
+    VARIABLE = 267,                /* VARIABLE  */
+    DIGIT = 268,                   /* DIGIT  */
+    LCB = 269,                     /* LCB  */
+    RCB = 270,                     /* RCB  */
+    LSB = 271,                     /* LSB  */
+    RSB = 272,                     /* RSB  */
+    EQUAL = 273,                   /* EQUAL  */
+    SEMICOLON = 274,               /* SEMICOLON  */
+    BUCK = 275                     /* BUCK  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

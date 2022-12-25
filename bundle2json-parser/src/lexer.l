@@ -18,6 +18,7 @@ int yyerror(char* msg);
 %%
     /* Main blocks */
 "define"                      { return KW_DEFINE; }
+"df"                          { return KW_DF; }
 "execution"                   { return KW_EXECUTION; }
 
     /* Sub blocks */
@@ -39,6 +40,7 @@ int yyerror(char* msg);
 "]"                           { return RSB; }
 "="                           { return EQUAL; }
 ";"                           { return SEMICOLON; }
+
 [ \n\t]                       {}
 .                             {}
 

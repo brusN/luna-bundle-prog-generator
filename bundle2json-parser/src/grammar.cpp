@@ -121,24 +121,26 @@ enum yysymbol_kind_t
   YYSYMBOL_KW_RUN = 8,                     /* KW_RUN  */
   YYSYMBOL_KW_ON = 9,                      /* KW_ON  */
   YYSYMBOL_KW_RANKS = 10,                  /* KW_RANKS  */
-  YYSYMBOL_VARIABLE = 11,                  /* VARIABLE  */
-  YYSYMBOL_DIGIT = 12,                     /* DIGIT  */
-  YYSYMBOL_LCB = 13,                       /* LCB  */
-  YYSYMBOL_RCB = 14,                       /* RCB  */
-  YYSYMBOL_LSB = 15,                       /* LSB  */
-  YYSYMBOL_RSB = 16,                       /* RSB  */
-  YYSYMBOL_EQUAL = 17,                     /* EQUAL  */
-  YYSYMBOL_SEMICOLON = 18,                 /* SEMICOLON  */
-  YYSYMBOL_BUCK = 19,                      /* BUCK  */
-  YYSYMBOL_YYACCEPT = 20,                  /* $accept  */
-  YYSYMBOL_input = 21,                     /* input  */
-  YYSYMBOL_define_context = 22,            /* define_context  */
-  YYSYMBOL_const_def = 23,                 /* const_def  */
-  YYSYMBOL_execution_context = 24,         /* execution_context  */
-  YYSYMBOL_execution_subblock = 25,        /* execution_subblock  */
-  YYSYMBOL_send_block = 26,                /* send_block  */
-  YYSYMBOL_run_block = 27,                 /* run_block  */
-  YYSYMBOL_task_name = 28                  /* task_name  */
+  YYSYMBOL_KW_DF = 11,                     /* KW_DF  */
+  YYSYMBOL_VARIABLE = 12,                  /* VARIABLE  */
+  YYSYMBOL_DIGIT = 13,                     /* DIGIT  */
+  YYSYMBOL_LCB = 14,                       /* LCB  */
+  YYSYMBOL_RCB = 15,                       /* RCB  */
+  YYSYMBOL_LSB = 16,                       /* LSB  */
+  YYSYMBOL_RSB = 17,                       /* RSB  */
+  YYSYMBOL_EQUAL = 18,                     /* EQUAL  */
+  YYSYMBOL_SEMICOLON = 19,                 /* SEMICOLON  */
+  YYSYMBOL_BUCK = 20,                      /* BUCK  */
+  YYSYMBOL_YYACCEPT = 21,                  /* $accept  */
+  YYSYMBOL_input = 22,                     /* input  */
+  YYSYMBOL_define_context = 23,            /* define_context  */
+  YYSYMBOL_const_def = 24,                 /* const_def  */
+  YYSYMBOL_execution_context = 25,         /* execution_context  */
+  YYSYMBOL_execution_subblock = 26,        /* execution_subblock  */
+  YYSYMBOL_send_block = 27,                /* send_block  */
+  YYSYMBOL_run_block = 28,                 /* run_block  */
+  YYSYMBOL_define_df_block = 29,           /* define_df_block  */
+  YYSYMBOL_task_name = 30                  /* task_name  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -466,19 +468,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   54
+#define YYLAST   68
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  20
+#define YYNTOKENS  21
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  9
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  17
+#define YYNRULES  19
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  49
+#define YYNSTATES  54
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   274
+#define YYMAXUTOK   275
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -519,7 +521,7 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19
+      15,    16,    17,    18,    19,    20
 };
 
 #if YYDEBUG
@@ -527,7 +529,7 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    25,    25,    26,    27,    28,    29,    32,    32,    34,
-      38,    38,    40,    40,    42,    50,    57,    57
+      38,    38,    40,    40,    40,    42,    50,    57,    63,    63
 };
 #endif
 
@@ -545,10 +547,10 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "KW_DEFINE",
   "KW_EXECUTION", "KW_SEND", "KW_FROM", "KW_TO", "KW_RUN", "KW_ON",
-  "KW_RANKS", "VARIABLE", "DIGIT", "LCB", "RCB", "LSB", "RSB", "EQUAL",
-  "SEMICOLON", "BUCK", "$accept", "input", "define_context", "const_def",
-  "execution_context", "execution_subblock", "send_block", "run_block",
-  "task_name", YY_NULLPTR
+  "KW_RANKS", "KW_DF", "VARIABLE", "DIGIT", "LCB", "RCB", "LSB", "RSB",
+  "EQUAL", "SEMICOLON", "BUCK", "$accept", "input", "define_context",
+  "const_def", "execution_context", "execution_subblock", "send_block",
+  "run_block", "define_df_block", "task_name", YY_NULLPTR
 };
 
 static const char *
@@ -558,7 +560,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-21)
+#define YYPACT_NINF (-23)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -572,11 +574,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       5,     6,     7,    18,    13,    21,   -21,    14,    28,    19,
-     -21,    23,    24,    -4,   -21,   -21,   -21,    25,    12,    32,
-     -21,    33,    26,    29,   -21,   -21,    22,    -3,    30,    34,
-      35,    38,   -21,   -21,    -2,     8,    37,    36,    39,   -21,
-     -21,     9,    41,   -21,    27,   -21,    31,   -21,   -21
+      35,    -9,    -5,    11,     8,    26,   -23,     1,    31,    21,
+     -23,    15,    28,    29,    -2,   -23,   -23,   -23,   -23,    30,
+      32,    38,   -23,    33,    41,    34,    39,   -23,   -23,    25,
+      -1,    37,    36,    40,    43,    42,   -23,   -23,     7,    13,
+     -23,    47,    44,    45,   -23,   -23,    22,    46,   -23,    48,
+     -23,    49,   -23,   -23
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -585,22 +588,23 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     0,     0,     0,     1,     0,     0,     0,
-       7,     0,     0,     0,    10,    13,    12,     0,     0,     0,
-       8,     0,    16,     0,     3,    11,     0,     0,     0,     0,
-       0,     0,     9,     6,     0,     0,     0,     0,     0,     4,
-       5,     0,     0,    17,     0,     2,     0,    15,    14
+       7,     0,     0,     0,     0,    10,    13,    12,    14,     0,
+       0,     0,     8,     0,     0,    18,     0,     3,    11,     0,
+       0,     0,     0,     0,     0,     0,     9,     6,     0,     0,
+      17,     0,     0,     0,     4,     5,     0,     0,    19,     0,
+       2,     0,    16,    15
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -21,   -21,   -21,    45,   -20,   -13,   -21,   -21,   -21
+     -23,   -23,   -23,    51,   -22,   -14,   -23,   -23,   -23,   -23
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     3,     9,    10,    13,    14,    15,    16,    23
+       0,     3,     9,    10,    14,    15,    16,    17,    18,    26
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -608,47 +612,50 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      25,    11,    11,    11,    12,    12,    12,    34,     1,     2,
-      24,    33,    39,    11,    11,    41,    12,    12,     6,     4,
-       5,    25,    40,    45,     7,    27,    11,     8,    25,    12,
-       7,    17,    18,    19,    21,    22,    28,    26,    31,    29,
-      32,    30,     0,    35,    42,    47,    36,    37,    38,    48,
-       0,    44,    43,    46,    20
+      28,    11,    11,    12,    12,     4,    13,    13,    38,     5,
+      11,     6,    12,    27,    37,    13,    11,    46,    12,    19,
+       7,    13,    44,     8,    28,    11,    23,    12,    45,    11,
+      13,    12,    28,     7,    13,    20,    21,    50,     1,     2,
+      24,    25,    31,    29,    36,    32,    30,    33,    35,     0,
+      34,    39,    43,    41,    47,    40,    42,     0,    49,    51,
+      22,    48,     0,     0,     0,     0,     0,    52,    53
 };
 
 static const yytype_int8 yycheck[] =
 {
-      13,     5,     5,     5,     8,     8,     8,    27,     3,     4,
-      14,    14,    14,     5,     5,    35,     8,     8,     0,    13,
-      13,    34,    14,    14,    11,    13,     5,    14,    41,     8,
-      11,    17,     4,    14,    11,    11,     4,    12,     9,     6,
-      18,    15,    -1,    13,     7,    18,    12,    12,    10,    18,
-      -1,    12,    16,    12,     9
+      14,     3,     3,     5,     5,    14,     8,     8,    30,    14,
+       3,     0,     5,    15,    15,     8,     3,    39,     5,    18,
+      12,     8,    15,    15,    38,     3,    11,     5,    15,     3,
+       8,     5,    46,    12,     8,     4,    15,    15,     3,     4,
+      12,    12,     4,    13,    19,    12,    14,     6,     9,    -1,
+      16,    14,    10,    13,     7,    19,    13,    -1,    13,    13,
+       9,    17,    -1,    -1,    -1,    -1,    -1,    19,    19
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     4,    21,    13,    13,     0,    11,    14,    22,
-      23,     5,     8,    24,    25,    26,    27,    17,     4,    14,
-      23,    11,    11,    28,    14,    25,    12,    13,     4,     6,
-      15,     9,    18,    14,    24,    13,    12,    12,    10,    14,
-      14,    24,     7,    16,    12,    14,    12,    18,    18
+       0,     3,     4,    22,    14,    14,     0,    12,    15,    23,
+      24,     3,     5,     8,    25,    26,    27,    28,    29,    18,
+       4,    15,    24,    11,    12,    12,    30,    15,    26,    13,
+      14,     4,    12,     6,    16,     9,    19,    15,    25,    14,
+      19,    13,    13,    10,    15,    15,    25,     7,    17,    13,
+      15,    13,    19,    19
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    20,    21,    21,    21,    21,    21,    22,    22,    23,
-      24,    24,    25,    25,    26,    27,    28,    28
+       0,    21,    22,    22,    22,    22,    22,    23,    23,    24,
+      25,    25,    26,    26,    26,    27,    28,    29,    30,    30
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     8,     4,     7,     7,     6,     1,     2,     4,
-       1,     2,     1,     1,     7,     6,     1,     4
+       1,     2,     1,     1,     1,     7,     6,     4,     1,     4
 };
 
 
@@ -1116,10 +1123,10 @@ yyreduce:
                                           {
      container.getDefines().insert(std::make_pair(yyvsp[-3], yyvsp[-1]));
 }
-#line 1120 "src/grammar.cpp"
+#line 1127 "src/grammar.cpp"
     break;
 
-  case 14: /* send_block: KW_SEND VARIABLE KW_FROM DIGIT KW_TO DIGIT SEMICOLON  */
+  case 15: /* send_block: KW_SEND VARIABLE KW_FROM DIGIT KW_TO DIGIT SEMICOLON  */
 #line 42 "src/grammar.ypp"
                                                                  {
      SendSubblock * block = new SendSubblock();
@@ -1128,10 +1135,10 @@ yyreduce:
      block->setToRank(std::stoi(yyvsp[-1]));
      container.getExecuteBlocks().push_back(block);
 }
-#line 1132 "src/grammar.cpp"
+#line 1139 "src/grammar.cpp"
     break;
 
-  case 15: /* run_block: KW_RUN task_name KW_ON KW_RANKS DIGIT SEMICOLON  */
+  case 16: /* run_block: KW_RUN task_name KW_ON KW_RANKS DIGIT SEMICOLON  */
 #line 50 "src/grammar.ypp"
                                                            {
      RunSubblock * block = new RunSubblock();
@@ -1139,11 +1146,21 @@ yyreduce:
      block->setRank(std::stoi(yyvsp[-1]));
      container.getExecuteBlocks().push_back(block);
 }
-#line 1143 "src/grammar.cpp"
+#line 1150 "src/grammar.cpp"
+    break;
+
+  case 17: /* define_df_block: KW_DEFINE KW_DF VARIABLE SEMICOLON  */
+#line 57 "src/grammar.ypp"
+                                                    {
+     DefineDataFragmentBlock * block = new DefineDataFragmentBlock();
+     block->setName(yyvsp[-1]);
+     container.getExecuteBlocks().push_back(block);
+}
+#line 1160 "src/grammar.cpp"
     break;
 
 
-#line 1147 "src/grammar.cpp"
+#line 1164 "src/grammar.cpp"
 
       default: break;
     }
@@ -1336,4 +1353,4 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 59 "src/grammar.ypp"
+#line 65 "src/grammar.ypp"

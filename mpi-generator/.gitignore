@@ -3,6 +3,7 @@ venv/
 
 build/
 files/
-mpi_src.cpp
 
 src/__pycache__/
+
+mpi_prog.cpp
