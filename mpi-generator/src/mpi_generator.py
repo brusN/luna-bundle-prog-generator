@@ -10,7 +10,6 @@ def print_parse_error(exception):
 
 
 def parse_build_config():
-    build_config = None
     logging.info('Parsing arguments')
     try:
         config_parser = BuildConfigParser()

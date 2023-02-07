@@ -7,3 +7,5 @@ files/
 src/__pycache__/
 
 mpi_prog.cpp
+
+*/__pycache__/
