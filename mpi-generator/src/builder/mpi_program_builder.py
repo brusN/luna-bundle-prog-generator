@@ -191,6 +191,8 @@ class MPIProgramBuilder:
                 self._generate_define_df(exec_block['name'])
             elif exec_block['type'] == 'run':
                 self._generate_exec_cf(self.data.calculation_fragments[exec_block['cfs']], exec_block['rank'])
+            elif exec_block['type'] == 'send':
+                self.
 
     def _generate_main_func(self):
         self.cpp_file_handler.write_line("int main(int argc, char** argv) {")
