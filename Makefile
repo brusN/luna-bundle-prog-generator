@@ -40,4 +40,19 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR) $(PREF_SRC)lexer.c $(PREF_SRC)grammar.cpp
+
+
+if (rank == 0) {
+	void * buff = new(val.get_ser_size());
+	val.serialize(buff, val.get_ser_size());
+	MPI_SEND();
+}
+
+if (rank == 1) {
+	MPI
+	void * buff = new(val.get_ser_size());
+	MPI_Recv();
+}
+
+if (rank == 1)

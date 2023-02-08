@@ -1,6 +1,6 @@
-#line 2 "src/lexer.c"
+#line 1 "./bundle2json-parser/src/lexer.c"
 
-#line 4 "src/lexer.c"
+#line 3 "./bundle2json-parser/src/lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -470,8 +470,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "src/lexer.l"
-#line 2 "src/lexer.l"
+#line 1 "./bundle2json-parser/src/lexer.l"
+#line 2 "./bundle2json-parser/src/lexer.l"
 #include <iostream>
 #include <string>
 
@@ -486,8 +486,8 @@ extern YYSTYPE yylval;
 
 int yyerror(char* msg);
 
-#line 490 "src/lexer.c"
-#line 491 "src/lexer.c"
+#line 489 "./bundle2json-parser/src/lexer.c"
+#line 490 "./bundle2json-parser/src/lexer.c"
 
 #define INITIAL 0
 
@@ -704,11 +704,11 @@ YY_DECL
 		}
 
 	{
-#line 18 "src/lexer.l"
+#line 18 "./bundle2json-parser/src/lexer.l"
 
-#line 20 "src/lexer.l"
+#line 20 "./bundle2json-parser/src/lexer.l"
     /* Main blocks */
-#line 712 "src/lexer.c"
+#line 711 "./bundle2json-parser/src/lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -767,113 +767,113 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 21 "src/lexer.l"
+#line 21 "./bundle2json-parser/src/lexer.l"
 { return KW_DEFINE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 22 "src/lexer.l"
+#line 22 "./bundle2json-parser/src/lexer.l"
 { return KW_DF; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 23 "src/lexer.l"
+#line 23 "./bundle2json-parser/src/lexer.l"
 { return KW_EXECUTION; }
 	YY_BREAK
 /* Sub blocks */
 case 4:
 YY_RULE_SETUP
-#line 26 "src/lexer.l"
+#line 26 "./bundle2json-parser/src/lexer.l"
 { return KW_RUN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "src/lexer.l"
+#line 27 "./bundle2json-parser/src/lexer.l"
 { return KW_FROM; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "src/lexer.l"
+#line 28 "./bundle2json-parser/src/lexer.l"
 { return KW_TO; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 30 "src/lexer.l"
+#line 30 "./bundle2json-parser/src/lexer.l"
 { return KW_SEND; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 31 "src/lexer.l"
+#line 31 "./bundle2json-parser/src/lexer.l"
 { return KW_ON; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "src/lexer.l"
+#line 32 "./bundle2json-parser/src/lexer.l"
 { return KW_RANKS; }
 	YY_BREAK
 /* Symbols */
 case 10:
 YY_RULE_SETUP
-#line 35 "src/lexer.l"
+#line 35 "./bundle2json-parser/src/lexer.l"
 { yylval = std::string(yytext); return DIGIT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 36 "src/lexer.l"
+#line 36 "./bundle2json-parser/src/lexer.l"
 { yylval = std::string(yytext); return VARIABLE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 37 "src/lexer.l"
+#line 37 "./bundle2json-parser/src/lexer.l"
 { return BUCK; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 38 "src/lexer.l"
+#line 38 "./bundle2json-parser/src/lexer.l"
 { return LCB; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 39 "src/lexer.l"
+#line 39 "./bundle2json-parser/src/lexer.l"
 { return RCB; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 40 "src/lexer.l"
+#line 40 "./bundle2json-parser/src/lexer.l"
 { return LSB; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 41 "src/lexer.l"
+#line 41 "./bundle2json-parser/src/lexer.l"
 { return RSB; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 42 "src/lexer.l"
+#line 42 "./bundle2json-parser/src/lexer.l"
 { return EQUAL; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 43 "src/lexer.l"
+#line 43 "./bundle2json-parser/src/lexer.l"
 { return SEMICOLON; }
 	YY_BREAK
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 45 "src/lexer.l"
+#line 45 "./bundle2json-parser/src/lexer.l"
 {}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 46 "src/lexer.l"
+#line 46 "./bundle2json-parser/src/lexer.l"
 {}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 48 "src/lexer.l"
+#line 48 "./bundle2json-parser/src/lexer.l"
 ECHO;
 	YY_BREAK
-#line 877 "src/lexer.c"
+#line 876 "./bundle2json-parser/src/lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1878,7 +1878,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 48 "src/lexer.l"
+#line 48 "./bundle2json-parser/src/lexer.l"
 
 
 int yyerror(char* msg) {
