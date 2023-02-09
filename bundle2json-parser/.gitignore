@@ -2,3 +2,8 @@ bin/
 build/
 files/
 .vscode/
+
+# This is generated from compiling lexer.l and grammar.ypp 
+src/grammar.cpp
+src/grammar.hpp
+src/lexer.c

@@ -12,23 +12,26 @@ OBJ_CPP=$(patsubst $(PREF_SRC)%.cpp, $(BUILD_DIR)%.o, $(SRC_CPP))
 
 
 # Building parser module
-$(TARGET): $(OBJ_CPP) $(BUILD_DIR)lexer.o $(BIN_DIR)
-	$(CC) $(OBJ_CPP) $(OBJ_C) -o $(TARGET)
+$(TARGET): $(OBJ_CPP) $(BIN_DIR) $(BUILD_DIR)lexer.o $(BUILD_DIR)grammar.o
+	$(CC) $(OBJ_CPP) $(BUILD_DIR)lexer.o $(BUILD_DIR)grammar.o -o $(TARGET) -std=c++14
 
 
 ## Compiling c++ files to object files
 $(BUILD_DIR)%.o: $(PREF_SRC)%.cpp $(BUILD_DIR)
 	$(CC) -c $< -o $@
 
-$(BUILD_DIR)lexer.o: $(PREF_SRC)lexer.c $(BUILD_DIR)
-	$(CC) -c $(PREF_SRC)lexer.c -o $(BUILD_DIR)lexer.o
-
 
 # Compiling flex and bison files
-$(PREF_SRC)lexer.c: 
+$(BUILD_DIR)lexer.o: $(PREF_SRC)lexer.c
+	$(CC) -c $(PREF_SRC)lexer.c -o $(BUILD_DIR)lexer.o
+
+$(BUILD_DIR)grammar.o: $(PREF_SRC)grammar.cpp
+	$(CC) -c $(PREF_SRC)grammar.cpp -o $(BUILD_DIR)grammar.o
+
+$(PREF_SRC)lexer.c: $(PREF_SRC)lexer.l $(PREF_SRC)grammar.cpp $(PREF_SRC)grammar.hpp
 	$(LEX_CC) -o $(PREF_SRC)lexer.c $(PREF_SRC)lexer.l
 
-$(PREF_SRC)grammar.cpp:
+$(PREF_SRC)grammar.cpp: $(PREF_SRC)grammar.ypp
 	$(YACC_CC) -d --debug $(PREF_SRC)grammar.ypp -o $(PREF_SRC)grammar.cpp
 
 
@@ -40,19 +43,4 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR) $(PREF_SRC)lexer.c $(PREF_SRC)grammar.cpp
-
-
-if (rank == 0) {
-	void * buff = new(val.get_ser_size());
-	val.serialize(buff, val.get_ser_size());
-	MPI_SEND();
-}
-
-if (rank == 1) {
-	MPI
-	void * buff = new(val.get_ser_size());
-	MPI_Recv();
-}
-
-if (rank == 1)
+	rm -rf $(BUILD_DIR) $(BIN_DIR) $(PREF_SRC)lexer.c $(PREF_SRC)grammar.cpp $(PREF_SRC)grammar.hpp
