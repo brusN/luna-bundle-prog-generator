@@ -23,12 +23,33 @@ class CPPFileHandler:
         self.file.write(f'void {code_fragment.name}({args});')
         self.write_empty_line()
 
+    def include_define_df(self, df_name):
+        self.write_line(f'DF {df_name};')
+
     def include_cf_execution(self, cf, rank):
         args = ''
         for arg in cf.args:
             args += arg.toStr() + ', '
         args = args[:-2]
         self.write_line(f'if (rank == {rank}) {{ {cf.name}({args});}}')
+
+    def include_df_send(self, df_name, from_rank, to_rank):
+        self.write_line(f'\
+        if (rank == {from_rank}) {{ \
+            void * {df_name}_buff = malloc({df_name}.get_serialization_size()); \
+            {df_name}.serialize({df_name}_buff, {df_name}.get_serialization_size()); \
+            MPI_Send({df_name}_buff, {df_name}.get_serialization_size(), MPI_BYTE, 1, {from_rank}, MPI_COMM_WORLD); \
+            free({df_name}_buff); \
+        }} else if (rank == {to_rank}) {{ \
+            MPI_Status status; \
+            MPI_Probe(0, 0, MPI_COMM_WORLD, &status); \
+            int serializationSize; \
+            MPI_Get_count(&status, MPI_BYTE, &serializationSize); \
+            void * buff = malloc(x.get_serialization_size()); \
+            MPI_Recv(buff, serializationSize, MPI_BYTE, 0, {from_rank}, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
+            x.deserialize(buff, serializationSize); \
+            free(buff); \
+        }}')
 
     def __del__(self):
         self.file.close()

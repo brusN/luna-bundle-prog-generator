@@ -1,12 +1,12 @@
 import json
 import logging
 import os
-from src.handler.cpp_file_handler import CPPFileHandler
+from handler.cpp_file_handler import CPPFileHandler
 
 
 class ILunaFragment:
 
-    def toCPPSourceCode(self):
+    def to_cpp_src(self):
         pass
 
 
@@ -46,7 +46,7 @@ class CodeFragment(ILunaFragment):
     def __init__(self):
         self.args = []
 
-    def toCPPSourceCode(self):
+    def to_cpp_src(self):
         return f'void {self.name}();'
 
 
@@ -67,7 +67,7 @@ class DataFragment(ILunaFragment):
     def __init__(self, name):
         self.name = name
 
-    def toCPPSourceCode(self):
+    def to_cpp_src(self):
         return f'DF {self.name};'
 
 
@@ -174,11 +174,14 @@ class MPIProgramBuilder:
     def _finalize_mpi(self):
         self.cpp_file_handler.write_line("MPI_Finalize();")
 
-    def _generate_define_df(self, name):
-        self.cpp_file_handler.write_line(f'DF {name};')
+    def _generate_define_df(self, df_name):
+        self.cpp_file_handler.include_define_df(df_name)
 
     def _generate_exec_cf(self, cf, rank):
-        self.cpp_file_handler.include_cf_execution(cf, rank)
+        self.cpp_file_handler.include_cf_execution(cf['code'], rank)
+
+    def _generate_send_df(self, df_name, from_rank, to_rank):
+        self.cpp_file_handler.include_df_send(df_name, from_rank, to_rank)
 
     def _generate_program_body(self):
         with open(f'{self.build_config.bundle_json_file_path}', 'r') as bundle_json_file:
@@ -187,12 +190,13 @@ class MPIProgramBuilder:
         # Defining all data fragments
         execute = bundle['execute']
         for exec_block in execute:
-            if exec_block['type'] == 'df':
-                self._generate_define_df(exec_block['name'])
-            elif exec_block['type'] == 'run':
-                self._generate_exec_cf(self.data.calculation_fragments[exec_block['cfs']], exec_block['rank'])
-            elif exec_block['type'] == 'send':
-                self.
+            match exec_block['type']:
+                case 'df':
+                    self._generate_define_df(exec_block['name'])
+                case 'run':
+                    self._generate_exec_cf(`self.data.calculation_fragments[exec_block['cfs']]:`, exec_block['rank'])
+                case 'send':
+                    self._generate_send_df(exec_block['data'], exec_block['from'], exec_block['to'])
 
     def _generate_main_func(self):
         self.cpp_file_handler.write_line("int main(int argc, char** argv) {")
