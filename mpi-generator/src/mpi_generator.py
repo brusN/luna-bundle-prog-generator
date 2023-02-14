@@ -25,6 +25,7 @@ def main():
     build_config = parse_build_config()
     mpi_builder = MPIProgramBuilder(build_config=build_config)
     mpi_builder.compile_luna_prog()
+    mpi_builder.get_bundle_json()
     mpi_builder.parse_program_recom_json()
     mpi_builder.generate_mpi_src()
 

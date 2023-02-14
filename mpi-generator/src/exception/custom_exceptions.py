@@ -1,0 +1,2 @@
+class OsCommandExecutionException(Exception):
+    pass
