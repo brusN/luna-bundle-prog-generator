@@ -42,13 +42,14 @@ class VarCFArgument(CalculationFragmentArgument):
 
 class CodeFragment(ILunaFragment):
     name: str
+    code: str
     args: list
 
     def __init__(self):
         self.args = []
 
     def to_cpp_src(self):
-        return f'void {self.name}();'
+        return f'void {self.code}();'
 
 
 class CalculationFragment(ILunaFragment):
@@ -111,7 +112,7 @@ class MPIProgramBuilder:
         self._args_type_mapper = ArgTypeMapper()
         self._data = LunaFragments()
         self._cpp_file_handler = CPPFileHandler(fileName=self.build_config.output)
-        self._bundle_json_file_path = self._luna_build_dir + './prog_bundle.json'
+        self._bundle_json_file_path = self._luna_build_dir + '/prog_bundle.json'
 
     def compile_luna_prog(self):
         # Example: luna --compile-only --build-dir=build program.fa
@@ -128,7 +129,7 @@ class MPIProgramBuilder:
     def get_bundle_json(self):
         compile_os_command = '{luna_bundle_parser} {bundle_path} {output_json_path}'.format(
             luna_bundle_parser=self._luna_bundle_parser,
-            bundle_path=self.build_config.bundle_path,
+            bundle_path=self.build_config.bundle_file_path,
             output_json_path=self._bundle_json_file_path,
         )
         logging.info('Parsing bundle file >>> ' + compile_os_command)
@@ -145,7 +146,8 @@ class MPIProgramBuilder:
             raw = program_recom_json[block_name]
             if raw['type'] == 'extern':
                 code_fragment = CodeFragment()
-                code_fragment.name = raw['code']
+                code_fragment.name = block_name
+                code_fragment.code = raw['code']
 
                 arg_index = 0
                 for arg in raw['args']:
@@ -193,7 +195,7 @@ class MPIProgramBuilder:
         self._cpp_file_handler.include_define_df(df_name)
 
     def _generate_exec_cf(self, cf, rank):
-        self._cpp_file_handler.include_cf_execution(cf['code'], rank)
+        self._cpp_file_handler.include_cf_execution(cf, self._data.code_fragments[cf.code], rank)
 
     def _generate_send_df(self, df_name, from_rank, to_rank):
         self._cpp_file_handler.include_df_send(df_name, from_rank, to_rank)
@@ -203,8 +205,7 @@ class MPIProgramBuilder:
             bundle = json.load(bundle_json_file)
 
         # Defining all data fragments
-        execute = bundle['execute']
-        for exec_block in execute:
+        for exec_block in bundle['execute']:
             match exec_block['type']:
                 case 'df':
                     self._generate_define_df(exec_block['name'])

@@ -20,18 +20,18 @@ class CPPFileHandler:
         for arg in code_fragment.args:
             args += arg.to_string() + ', '
         args = args[:-2]
-        self.file.write(f'void {code_fragment.name}({args});')
+        self.file.write(f'void {code_fragment.code}({args});')
         self.write_empty_line()
 
     def include_define_df(self, df_name):
         self.write_line(f'DF {df_name};')
 
-    def include_cf_execution(self, cf, rank):
+    def include_cf_execution(self, calculation_fragment, code_fragment, rank):
         args = ''
-        for arg in cf.args:
+        for arg in calculation_fragment.args:
             args += arg.toStr() + ', '
         args = args[:-2]
-        self.write_line(f'if (rank == {rank}) {{ {cf.name}({args});}}')
+        self.write_line(f'if (rank == {rank}) {{ {code_fragment.code}({args});}}')
 
     def include_df_send(self, df_name, from_rank, to_rank):
         self.write_line(f'\
