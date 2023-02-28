@@ -233,5 +233,5 @@ class MPIProgramBuilder:
         self._include_extern_code_blocks()
         self._generate_main_func()
 
-    def generate_program(self):
+    def build_program(self):
         pass
