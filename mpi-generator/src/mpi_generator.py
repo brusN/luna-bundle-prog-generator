@@ -1,3 +1,4 @@
+from builder.mpi_program_compiler import MPIProgramCompiler
 from config.build_config_parser import *
 from builder.mpi_program_builder import *
 
@@ -28,6 +29,10 @@ def main():
     mpi_builder.get_bundle_json()
     mpi_builder.parse_program_recom_json()
     mpi_builder.generate_mpi_src()
+    mpi_builder.finalize()
+
+    mpi_program_compiler = MPIProgramCompiler()
+    mpi_program_compiler.compile(build_config.output, build_config.cpp_codes_path, 'compiled_mpi_prog')
 
 
 if __name__ == '__main__':

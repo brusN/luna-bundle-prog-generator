@@ -175,6 +175,7 @@ class MPIProgramBuilder:
 
     def _include_headers(self):
         self._cpp_file_handler.include_std_header(self.build_config.mpi_header)
+        self._cpp_file_handler.include_std_header('df.h')
         self._cpp_file_handler.write_empty_line()
 
     def _include_extern_code_blocks(self):
@@ -233,5 +234,5 @@ class MPIProgramBuilder:
         self._include_extern_code_blocks()
         self._generate_main_func()
 
-    def build_program(self):
-        pass
+    def finalize(self):
+        self._cpp_file_handler.finalize()

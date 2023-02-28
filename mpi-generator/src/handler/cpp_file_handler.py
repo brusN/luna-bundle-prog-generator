@@ -1,18 +1,18 @@
 class CPPFileHandler:
     def __init__(self, fileName):
-        self.file = open(fileName, 'w+')
+        self._file = open(fileName, 'w+')
 
     def write_line(self, line):
-        self.file.write(f'{line}\n')
+        self._file.write(f'{line}\n')
 
     def write_empty_line(self):
-        self.file.write('\n')
+        self._file.write('\n')
 
     def include_user_header(self, header_name):
-        self.file.write(f'#include "{header_name}"')
+        self._file.write(f'#include "{header_name}"')
 
     def include_std_header(self, header_name):
-        self.file.write(f'#include <{header_name}>')
+        self._file.write(f'#include <{header_name}>')
         self.write_empty_line()
 
     def include_extern_void_func(self, code_fragment):
@@ -20,7 +20,7 @@ class CPPFileHandler:
         for arg in code_fragment.args:
             args += arg.to_string() + ', '
         args = args[:-2]
-        self.file.write(f'void {code_fragment.code}({args});')
+        self._file.write(f'extern "C" void {code_fragment.code}({args});')
         self.write_empty_line()
 
     def include_define_df(self, df_name):
@@ -51,5 +51,8 @@ class CPPFileHandler:
             free(buff); \
         }}')
 
+    def finalize(self):
+        self._file.close()
+
     def __del__(self):
-        self.file.close()
+        self._file.close()
