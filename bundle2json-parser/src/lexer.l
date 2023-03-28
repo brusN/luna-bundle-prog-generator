@@ -28,10 +28,13 @@ int yyerror(char* msg);
 
 "send"                        { return KW_SEND; }
 "on"                          { return KW_ON; }
-"rank"                       { return KW_RANKS; }
+"rank"                        { return KW_RANKS; }
+
+"for"                         { return KW_FOR; }
+".."                          { return KW_DOUBLE_DOT; }
 
     /* Symbols */
-[0-9]+                        { yylval = std::string(yytext); return DIGIT; }
+[0-9]+                        { yylval = std::string(yytext); return NUMBER; }
 [A-Za-z_][A-Za-z0-9_]*        { yylval = std::string(yytext); return VARIABLE; }
 "$"                           { return BUCK; }
 "{"                           { return LCB; }

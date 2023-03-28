@@ -12,32 +12,33 @@ public:
 
 class RunSubblock: public IExecuteSubblock {
 private:
-    int rank;
-    std::string task;
+    std::string rank;
+    std::list<std::string> cfName;
+
+    std::string buildNameForJSON();
 
 public:
+    std::string getRank() const;
+    void setRank(std::string rank);
 
-    int getRank() const;
-    void setRank(int rank);
-
-    std::string getTask() const;
-    void setTask(std::string task);
+    std::list<std::string> getCfName() const;
+    void setCfName(std::list<std::string> task);
 
     std::string toJSONStruct();
 };
 
 class SendSubblock: public IExecuteSubblock {
 private:
-    int fromRank;
-    int toRank;
+    std::string fromRank;
+    std::string toRank;
     std::string dfName;
 
 public:
-    int getFromRank() const;
-    void setFromRank(int fromRank);
+    std::string getFromRank() const;
+    void setFromRank(std::string fromRank);
 
-    int getToRank() const;
-    void setToRank(int toRank);
+    std::string getToRank() const;
+    void setToRank(std::string toRank);
 
     std::string getDFName() const;
     void setDFName(std::string dfName);

@@ -1,43 +1,53 @@
 #include "parserlib.h"
 
-int RunSubblock::getRank() const {
+std::string RunSubblock::getRank() const {
     return rank;
 }
 
-void RunSubblock::setRank(int rank) {
+void RunSubblock::setRank(std::string rank) {
     this->rank = rank;
 }
 
-std::string RunSubblock::getTask() const {
-    return task;
+std::list<std::string> RunSubblock::getCfName() const {
+    return this->cfName;
 }
 
-void RunSubblock::setTask(std::string task) {
-    this->task = task;
+void RunSubblock::setCfName(std::list<std::string> task) {
+    this->cfName = task;
+}
+
+std::string RunSubblock::buildNameForJSON() {
+    auto cfNameIterator = cfName.begin();
+    std::string taskName = "[\"" + *cfNameIterator + "\"";
+    for (++cfNameIterator; cfNameIterator != cfName.end(); ++cfNameIterator) {
+        taskName += ", \"" + *cfNameIterator + "\"";
+    }
+    taskName += "]";
+    return taskName;
 }
 
 std::string RunSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"run\"," + 
-                                            "\"rank\": " + std::to_string(rank) + "," + 
-                                            "\"cfs\": \"" + task + "\"" +
+                                            "\"rank\": " + rank + "," + 
+                                            "\"cf\": \"" + buildNameForJSON() + "\"" +
                                         "}";
     return buildString;
 }
 
-int SendSubblock::getFromRank() const {
+std::string SendSubblock::getFromRank() const {
     return fromRank;
 }
 
-void SendSubblock::setFromRank(int fromRank) {
+void SendSubblock::setFromRank(std::string fromRank) {
     this->fromRank = fromRank;
 }
 
-int SendSubblock::getToRank() const {
+std::string SendSubblock::getToRank() const {
     return toRank;
 }
 
-void SendSubblock::setToRank(int toRank) {
+void SendSubblock::setToRank(std::string toRank) {
     this->toRank = toRank;
 }
 
@@ -53,8 +63,8 @@ std::string SendSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"send\"," + 
                                             "\"data\": \"" + dfName + "\"," + 
-                                            "\"from\": " + std::to_string(fromRank) + "," +
-                                            "\"to\": " + std::to_string(toRank) + 
+                                            "\"from\": " + fromRank + "," +
+                                            "\"to\": " + toRank + 
                                             "}";
     return buildString;
 }
