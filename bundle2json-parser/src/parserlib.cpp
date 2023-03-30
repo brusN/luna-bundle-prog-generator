@@ -82,16 +82,25 @@ std::string DefineDataFragmentBlock::toJSONStruct() {
     return buildString;
 }
 
-std::map<std::string, std::string>& BundleContainer::getDefines() {
-    return defines;
+std::list<std::string> TaskDescriptor::getName() {
+    return this->name;
 }
 
-std::list<IExecuteSubblock*>& BundleContainer::getExecuteBlocks() {
-    return executeBlocks;
+void TaskDescriptor::setName(std::list<std::string> name) {
+    this->name = name;
+}
+
+// Using Linux in-build libuuid 
+std::string UUIDGenerator::generateUUID() {
+    uuid_t uuid;
+    char uuidCharBuffer[37]; // 36 bytes uuid + '\0'
+    uuid_generate(uuid);
+    uuid_unparse(uuid, uuidCharBuffer);
+    return std::string(uuidCharBuffer);
 }
 
 BundleContainer::~BundleContainer() {
-    for (auto block: executeBlocks) {
-        delete block;
+    for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+        delete it->second;
     }
 }

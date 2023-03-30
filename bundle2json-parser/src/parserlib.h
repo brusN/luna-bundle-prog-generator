@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <uuid/uuid.h>
 
 // Inteface for subblock bodies
 class IExecuteSubblock {
@@ -61,14 +62,31 @@ public:
     std::string toJSONStruct();
 };
 
-class BundleContainer {
+class TaskDescriptor {
 private:
-    std::map<std::string, std::string> defines;
-    std::list<IExecuteSubblock*> executeBlocks;
+    std::list<std::string> name;
 
 public:
-    std::map<std::string, std::string> & getDefines();
-    std::list<IExecuteSubblock*> & getExecuteBlocks();
+    std::list<std::string> getName();
+    void setName(std::list<std::string> name);
+};
+
+class UUIDGenerator {
+public:
+    static std::string generateUUID();
+};
+
+class BundleContainer {
+private:
+    std::map<std::string, std::string> macroVars;
+    std::map<std::string, IExecuteSubblock *> blocks;
+    
+public:
+    void registerMacroVar(std::string varName, std::string value);
+    std::string getMacroVarValueByName(std::string varName);
+
+    std::string registerNewBlock(IExecuteSubblock *block);
+    IExecuteSubblock* getBlockByUUID(std::string uuid);
 
     ~BundleContainer();
 };
