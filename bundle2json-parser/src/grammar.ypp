@@ -46,24 +46,36 @@ for_block: KW_FOR VARIABLE EQUAL NUMBER KW_DOUBLE_DOT NUMBER LCB execution_conte
 send_block: KW_SEND VARIABLE KW_FROM NUMBER KW_TO NUMBER SEMICOLON {
      SendSubblock * block = new SendSubblock();
      block->setDFName($2);
-     block->setFromRank(std::stoi($4));
-     block->setToRank(std::stoi($6));
-     container.getExecuteBlocks().push_back(block);
+     block->setFromRank($4);
+     block->setToRank($6);
+     std::string uuid = container.registerNewBlock(block);
+     $$ = uuid;
 };
 
 run_block: KW_RUN task_name KW_ON KW_RANKS NUMBER SEMICOLON {
      RunSubblock * block = new RunSubblock();
      block->setTask($2);
      block->setRank(std::stoi($5));
-     container.getExecuteBlocks().push_back(block);
+     std::string uuid = container.registerNewBlock(block);
+     $$ = uuid;
 };
 
 define_df_block: KW_DEFINE KW_DF VARIABLE SEMICOLON {
-     DefineDataFragmentBlock * block = new DefineDataFragmentBlock();
+     DefineDataFragmentSubblock * block = new DefineDataFragmentSubblock();
      block->setName($3);
-     container.getExecuteBlocks().push_back(block);
+     std::string uuid = container.registerNewBlock(block);
+     $$ = uuid;
 };
 
-task_name: VARIABLE | task_name LSB NUMBER RSB;
-
+task_name: VARIABLE {
+     TaskDescriptor* task = new TaskDescriptor();
+     task->addNamePart($1);
+     std::string uuid = container.registerNewTask(task);
+     $$ = uuid; 
+} | task_name LSB NUMBER RSB {
+     std::string uuid = $1;
+     TaskDescriptor* task = container.getTaskByUUID(uuid);
+     task->addNamePart($3);
+     $$ = uuid;
+};
 %%

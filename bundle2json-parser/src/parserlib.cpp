@@ -1,5 +1,9 @@
 #include "parserlib.h"
 
+/*
+    ------------- RubSubblock impl -------------
+*/
+
 std::string RunSubblock::getRank() const {
     return rank;
 }
@@ -35,6 +39,10 @@ std::string RunSubblock::toJSONStruct() {
     return buildString;
 }
 
+/*
+    ------------- SendSubblock impl -------------
+*/ 
+
 std::string SendSubblock::getFromRank() const {
     return fromRank;
 }
@@ -69,18 +77,66 @@ std::string SendSubblock::toJSONStruct() {
     return buildString;
 }
 
-std::string DefineDataFragmentBlock::getName() {
+/*
+    ------------- DefineDataFragmentBlock impl -------------
+*/
+
+std::string DefineDataFragmentSubblock::getName() {
     return name;
 }
 
-void DefineDataFragmentBlock::setName(std::string name) {
+void DefineDataFragmentSubblock::setName(std::string name) {
     this->name = name;
 }
 
-std::string DefineDataFragmentBlock::toJSONStruct() {
+std::string DefineDataFragmentSubblock::toJSONStruct() {
     std::string buildString = std::string("{\"type\": \"df\", \"name\": \"" + name + "\"}");
     return buildString;
 }
+
+/*
+    ------------- ForSubblock impl -------------
+*/
+
+void ForSubblock::addBlockToBody(IExecuteSubblock* newBlock) {
+    body.emplace_back(newBlock);
+}
+
+void ForSubblock::setIteratorName(std::string iteratorName) {
+    this->iteratorName = iteratorName;
+}
+
+std::string ForSubblock::getIteratorName() {
+    return iteratorName;
+}
+
+void ForSubblock::setStartIndex(long startIndex) {
+    this->startIndex = startIndex;
+}
+
+long ForSubblock::getStartIndex() {
+    return startIndex;
+}
+
+void ForSubblock::setEndIndex(long endIndex) {
+    this->endIndex = endIndex;
+}
+
+long ForSubblock::getEndIndex() {
+    return endIndex;
+}
+
+/*
+    ------------- ExecutionContext impl -------------
+*/
+
+void ExecutionContext::addBlock(IExecuteSubblock* block) {
+    body.emplace_back(block);
+}
+
+/*
+    ------------- TaskDescriptor impl -------------
+*/
 
 std::list<std::string> TaskDescriptor::getName() {
     return this->name;
@@ -90,6 +146,14 @@ void TaskDescriptor::setName(std::list<std::string> name) {
     this->name = name;
 }
 
+void TaskDescriptor::addNamePart(std::string namePart) {
+    name.emplace_back(namePart);
+}
+
+/*
+   ------------- UUIDGenerator impl -------------
+*/
+
 // Using Linux in-build libuuid 
 std::string UUIDGenerator::generateUUID() {
     uuid_t uuid;
@@ -97,6 +161,39 @@ std::string UUIDGenerator::generateUUID() {
     uuid_generate(uuid);
     uuid_unparse(uuid, uuidCharBuffer);
     return std::string(uuidCharBuffer);
+}
+
+/*
+    ------------- Bundle container impl -------------
+*/
+
+void BundleContainer::registerMacroVar(std::string varName, std::string value) {
+    macroVars[varName] = value;
+}
+
+std::string BundleContainer::getMacroVarValueByName(std::string varName) {
+    return macroVars[varName];
+}
+
+std::string BundleContainer::registerNewBlock(IExecuteSubblock* block) {
+    std::string blockUUID = UUIDGenerator::generateUUID();
+    blocks[blockUUID] = block;
+    return blockUUID;
+}
+
+IExecuteSubblock* BundleContainer::getBlockByUUID(std::string uuid) {
+    return blocks[uuid];
+}
+
+std::string BundleContainer::registerNewTask(TaskDescriptor* task) 
+{
+    std::string taskUUID = UUIDGenerator::generateUUID();
+    tasks[taskUUID] = task;
+    return taskUUID; 
+}
+
+TaskDescriptor* BundleContainer::getTaskByUUID(std::string uuid) {
+    return tasks[uuid];
 }
 
 BundleContainer::~BundleContainer() {

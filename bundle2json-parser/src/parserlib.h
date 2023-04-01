@@ -47,11 +47,7 @@ public:
     std::string toJSONStruct();
 };
 
-enum DFType {
-    DF_INT, DF_DOUBLE, DF_STRING, DF_NAME, DF_VALUE
-};
-
-class DefineDataFragmentBlock: public IExecuteSubblock {
+class DefineDataFragmentSubblock: public IExecuteSubblock {
 private:
     std::string name;
 
@@ -62,6 +58,31 @@ public:
     std::string toJSONStruct();
 };
 
+class ForSubblock: public IExecuteSubblock {
+private:
+    std::list<IExecuteSubblock *> body;
+    std::string iteratorName;
+    long startIndex;
+    long endIndex;
+
+public:
+    void addBlockToBody(IExecuteSubblock* newBlock);
+    void setIteratorName(std::string iteratorName);
+    std::string getIteratorName();
+    void setStartIndex(long startIndex);
+    long getStartIndex();
+    void setEndIndex(long endIndex);
+    long getEndIndex();
+};
+
+class ExecutionContext {
+private:
+    std::list<IExecuteSubblock*> body;
+
+public:
+    void addBlock(IExecuteSubblock* block);
+};
+
 class TaskDescriptor {
 private:
     std::list<std::string> name;
@@ -69,6 +90,7 @@ private:
 public:
     std::list<std::string> getName();
     void setName(std::list<std::string> name);
+    void addNamePart(std::string namePart);
 };
 
 class UUIDGenerator {
@@ -79,14 +101,19 @@ public:
 class BundleContainer {
 private:
     std::map<std::string, std::string> macroVars;
-    std::map<std::string, IExecuteSubblock *> blocks;
+    std::map<std::string, IExecuteSubblock*> blocks;
+    std::map<std::string, TaskDescriptor*> tasks;
+    std::map<std::string, 
     
 public:
     void registerMacroVar(std::string varName, std::string value);
     std::string getMacroVarValueByName(std::string varName);
 
-    std::string registerNewBlock(IExecuteSubblock *block);
+    std::string registerNewBlock(IExecuteSubblock* block);
     IExecuteSubblock* getBlockByUUID(std::string uuid);
+
+    std::string registerNewTask(TaskDescriptor* task);
+    TaskDescriptor* getTaskByUUID(std::string uuid);
 
     ~BundleContainer();
 };
