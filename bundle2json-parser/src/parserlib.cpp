@@ -1,7 +1,7 @@
 #include "parserlib.h"
 
 /*
-    ------------- RubSubblock impl -------------
+    ------------- RunSubblock impl -------------
 */
 
 std::string& RunSubblock::getRank() {
@@ -34,7 +34,7 @@ std::string RunSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"run\"," + 
                                             "\"rank\": " + rank + "," + 
-                                            "\"cf\": \"" + buildNameForJSON() + "\"" +
+                                            "\"cf\": " + buildNameForJSON() +
                                         "}";
     return buildString;
 }
@@ -135,8 +135,8 @@ std::string ForSubblock::toJSONStruct() {
                                             "\"type\": \"for\"," + 
                                             "\"iterator\": \"" + iteratorName + "\"," + 
                                             "\"startValue\": " + std::to_string(startIndex) + "," +
-                                            "\"endValue\": " + std::to_string(endIndex) +
-                                            "[" + body->toJSONStruct() + "]" + 
+                                            "\"endValue\": " + std::to_string(endIndex) + "," +
+                                            "\"body\": " + body->toJSONStruct() + 
                                             "}";
     return buildString;
 }
@@ -155,12 +155,12 @@ std::list<IExecuteSubblock*>& ExecutionContext::getBody() {
 
 std::string ExecutionContext::toJSONStruct() {
     std::string delimiter = ", ";
-    std::string result = "{";
+    std::string result = "[";
     auto it = body.begin();
     for (it; it != --body.end(); ++it) {
         result += (*it)->toJSONStruct() + delimiter;
     }
-    result += (*it)->toJSONStruct() + "}";
+    result += (*it)->toJSONStruct() + "]";
     return result;
 }
 
@@ -178,19 +178,6 @@ void TaskDescriptor::setName(std::list<std::string> name) {
 
 void TaskDescriptor::addNamePart(std::string namePart) {
     name.emplace_back(namePart);
-}
-
-/*
-   ------------- UUIDGenerator impl -------------
-*/
-
-// Using Linux in-build libuuid 
-std::string UUIDGenerator::generateUUID() {
-    uuid_t uuid;
-    char uuidCharBuffer[37]; // 36 bytes uuid + '\0'
-    uuid_generate(uuid);
-    uuid_unparse(uuid, uuidCharBuffer);
-    return std::string(uuidCharBuffer);
 }
 
 /*

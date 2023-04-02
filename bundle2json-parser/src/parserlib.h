@@ -11,6 +11,38 @@ public:
     virtual std::string toJSONStruct() = 0;
 };
 
+class ExecutionContext: public IExecuteSubblock {
+private:
+    std::list<IExecuteSubblock*> body;
+
+public:
+    void addBlock(IExecuteSubblock* block);
+    std::list<IExecuteSubblock*>& getBody();
+
+    std::string toJSONStruct();
+};
+
+class TaskDescriptor {
+private:
+    std::list<std::string> name;
+
+public:
+    std::list<std::string>& getName();
+    void setName(std::list<std::string> name);
+    void addNamePart(std::string namePart);
+};
+
+class UUIDGenerator {
+public:
+    static std::string generateUUID() {
+        uuid_t uuid;
+        char uuidCharBuffer[37]; // 36 bytes uuid + '\0'
+        uuid_generate(uuid);
+        uuid_unparse(uuid, uuidCharBuffer);
+        return std::string(uuidCharBuffer);
+    }
+};
+
 class RunSubblock: public IExecuteSubblock {
 private:
     std::string rank;
@@ -79,32 +111,6 @@ public:
     long getEndIndex();
 
     std::string toJSONStruct();
-};
-
-class ExecutionContext: public IExecuteSubblock {
-private:
-    std::list<IExecuteSubblock*> body;
-
-public:
-    void addBlock(IExecuteSubblock* block);
-    std::list<IExecuteSubblock*>& getBody();
-
-    std::string toJSONStruct();
-};
-
-class TaskDescriptor {
-private:
-    std::list<std::string> name;
-
-public:
-    std::list<std::string>& getName();
-    void setName(std::list<std::string> name);
-    void addNamePart(std::string namePart);
-};
-
-class UUIDGenerator {
-public:
-    static std::string generateUUID();
 };
 
 class BundleContainer {

@@ -21,4 +21,6 @@ void JSONHandler::generateJSON(std::ofstream &outputFile, BundleContainer &lunaB
     auto mainExecutionContext = lunaBundle.getMainContext();
     outputFile << "\"execution\":";
     outputFile << mainExecutionContext->toJSONStruct();
+
+    outputFile << "}";
 }

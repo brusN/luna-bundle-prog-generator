@@ -24,7 +24,7 @@ $(TARGET_GENERATOR): $(TARGET_PARSER) $(PREF_PY_SRC)mpi_generator.py
 
 # Building parser module
 $(TARGET_PARSER): $(OBJ_CPP) $(BIN_DIR) $(BUILD_DIR)lexer.o $(BUILD_DIR)grammar.o
-	$(CC) $(OBJ_CPP) $(BUILD_DIR)lexer.o -o $(TARGET_PARSER) -std=c++14
+	$(CC) $(OBJ_CPP) $(BUILD_DIR)lexer.o -o $(TARGET_PARSER) -std=c++11 -luuid
 
 
 ## Compiling c++ files to object files
