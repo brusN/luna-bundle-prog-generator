@@ -13,7 +13,7 @@ BundleContainer container;
 
 %}
 
-%token KW_DEFINE KW_EXECUTION KW_SEND KW_FROM KW_TO KW_RUN KW_ON KW_RANKS KW_DF
+%token KW_DEFINE KW_EXECUTION KW_SEND KW_FROM KW_TO KW_RUN KW_ON KW_RANK KW_DF
 
 %token VARIABLE NUMBER
 
@@ -60,18 +60,18 @@ execution_subblock:
      | for_block       { $$ = $1; }
 ;
 
-for_block: KW_FOR VARIABLE EQUAL NUMBER KW_DOUBLE_DOT NUMBER LCB execution_context RCB {
+for_block: KW_FOR VARIABLE EQUAL var_or_value_or_macro KW_DOUBLE_DOT var_or_value_or_macro LCB execution_context RCB {
      ForSubblock* block = new ForSubblock();
      ExecutionContext* context = container.getContextByUUID($8);
      block->setIteratorName($2);
-     block->setStartIndex(std::stol($4));
-     block->setEndIndex(std::stol($6));
+     block->setStartIndex($4);
+     block->setEndIndex($6);
      block->setBody(context);
      std::string uuid = container.registerNewBlock(block);
      $$ = uuid;
 };
 
-send_block: KW_SEND VARIABLE KW_FROM NUMBER KW_TO NUMBER SEMICOLON {
+send_block: KW_SEND VARIABLE KW_FROM var_or_value_or_macro KW_TO var_or_value_or_macro SEMICOLON {
      SendSubblock * block = new SendSubblock();
      block->setDFName($2);
      block->setFromRank($4);
@@ -80,7 +80,7 @@ send_block: KW_SEND VARIABLE KW_FROM NUMBER KW_TO NUMBER SEMICOLON {
      $$ = uuid;
 };
 
-run_block: KW_RUN task_name KW_ON KW_RANKS NUMBER SEMICOLON {
+run_block: KW_RUN task_name KW_ON KW_RANK var_or_value_or_macro SEMICOLON {
      RunSubblock * block = new RunSubblock();
      TaskDescriptor* taskDescriptor = container.getTaskByUUID($2);
      block->setCfName(taskDescriptor->getName());
@@ -101,9 +101,20 @@ task_name: VARIABLE {
      task->addNamePart($1);
      std::string uuid = container.registerNewTask(task);
      $$ = uuid; 
-} | task_name LSB NUMBER RSB {
+} | task_name LSB var_or_value_or_macro RSB {
      TaskDescriptor* task = container.getTaskByUUID($1);
      task->addNamePart($3);
      $$ = $1;
 };
+
+macro_var: BUCK VARIABLE {
+     std::string value = container.getMacroVarValueByName($2);
+     $$ = value;   
+};
+
+var_or_value_or_macro: 
+     VARIABLE { $$ = $1; } 
+     | NUMBER { $$ = $1; }
+     | macro_var { $$ = $1; }
+;
 %%

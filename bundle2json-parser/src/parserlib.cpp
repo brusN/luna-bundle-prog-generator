@@ -33,7 +33,7 @@ std::string RunSubblock::buildNameForJSON() {
 std::string RunSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"run\"," + 
-                                            "\"rank\": " + rank + "," + 
+                                            "\"rank\": " + "\"" + rank + "\"" + "," + 
                                             "\"cf\": " + buildNameForJSON() +
                                         "}";
     return buildString;
@@ -71,8 +71,8 @@ std::string SendSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"send\"," + 
                                             "\"data\": \"" + dfName + "\"," + 
-                                            "\"from\": " + fromRank + "," +
-                                            "\"to\": " + toRank + 
+                                            "\"from\": " + "\"" + fromRank + "\"" + "," +
+                                            "\"to\": " + "\"" + toRank + "\"" + 
                                             "}";
     return buildString;
 }
@@ -114,19 +114,19 @@ std::string& ForSubblock::getIteratorName() {
     return iteratorName;
 }
 
-void ForSubblock::setStartIndex(long startIndex) {
+void ForSubblock::setStartIndex(std::string startIndex) {
     this->startIndex = startIndex;
 }
 
-long ForSubblock::getStartIndex() {
+std::string ForSubblock::getStartIndex() {
     return startIndex;
 }
 
-void ForSubblock::setEndIndex(long endIndex) {
+void ForSubblock::setEndIndex(std::string endIndex) {
     this->endIndex = endIndex;
 }
 
-long ForSubblock::getEndIndex() {
+std::string ForSubblock::getEndIndex() {
     return endIndex;
 }
 
@@ -134,8 +134,8 @@ std::string ForSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"for\"," + 
                                             "\"iterator\": \"" + iteratorName + "\"," + 
-                                            "\"startValue\": " + std::to_string(startIndex) + "," +
-                                            "\"endValue\": " + std::to_string(endIndex) + "," +
+                                            "\"startValue\": \"" + startIndex + "\"," +
+                                            "\"endValue\": \"" + endIndex + "\"," +
                                             "\"body\": " + body->toJSONStruct() + 
                                             "}";
     return buildString;

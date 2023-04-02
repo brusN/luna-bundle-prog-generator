@@ -28,7 +28,7 @@ int yyerror(char* msg);
 
 "send"                        { return KW_SEND; }
 "on"                          { return KW_ON; }
-"rank"                        { return KW_RANKS; }
+"rank"                        { return KW_RANK; }
 
 "for"                         { return KW_FOR; }
 ".."                          { return KW_DOUBLE_DOT; }

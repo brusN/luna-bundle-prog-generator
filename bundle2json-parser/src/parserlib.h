@@ -94,8 +94,8 @@ class ForSubblock: public IExecuteSubblock {
 private:
     ExecutionContext* body;
     std::string iteratorName;
-    long startIndex;
-    long endIndex;
+    std::string startIndex;
+    std::string endIndex;
 
 public:
     void setBody(ExecutionContext* context);
@@ -104,11 +104,11 @@ public:
     void setIteratorName(std::string iteratorName);
     std::string& getIteratorName();
 
-    void setStartIndex(long startIndex);
-    long getStartIndex();
+    void setStartIndex(std::string startIndex);
+    std::string getStartIndex();
 
-    void setEndIndex(long endIndex);
-    long getEndIndex();
+    void setEndIndex(std::string endIndex);
+    std::string getEndIndex();
 
     std::string toJSONStruct();
 };
