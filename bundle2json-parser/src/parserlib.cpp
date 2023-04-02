@@ -98,8 +98,12 @@ std::string DefineDataFragmentSubblock::toJSONStruct() {
     ------------- ForSubblock impl -------------
 */
 
-void ForSubblock::addBlockToBody(IExecuteSubblock* newBlock) {
-    body.emplace_back(newBlock);
+void ForSubblock::setBody(ExecutionContext* context) {
+    body = context;
+}
+
+ExecutionContext* ForSubblock::getBody() {
+    return body;
 }
 
 void ForSubblock::setIteratorName(std::string iteratorName) {
@@ -126,12 +130,40 @@ long ForSubblock::getEndIndex() {
     return endIndex;
 }
 
+std::string ForSubblock::buildBodyList() {
+    std::string delimiter = ", ";
+    std::string result = "";
+    auto bodyBlockList = body->getBody();
+
+    auto it = bodyBlockList.begin();
+    for (it; it != --bodyBlockList.end(); ++it) {
+        result += (*it)->toJSONStruct() + delimiter;
+    }
+    result += (*it)->toJSONStruct();
+    return result;
+}
+
+std::string ForSubblock::toJSONStruct() {
+    std::string buildString = std::string("{") + 
+                                            "\"type\": \"for\"," + 
+                                            "\"iterator\": \"" + iteratorName + "\"," + 
+                                            "\"startValue\": " + std::to_string(startIndex) + "," +
+                                            "\"endValue\": " + std::to_string(endIndex) +
+                                            "[" + buildBodyList() + "]" + 
+                                            "}";
+    return buildString;
+}
+
 /*
     ------------- ExecutionContext impl -------------
 */
 
 void ExecutionContext::addBlock(IExecuteSubblock* block) {
     body.emplace_back(block);
+}
+
+std::list<IExecuteSubblock*> ExecutionContext::getBody() {
+    return body;
 }
 
 /*
@@ -196,8 +228,37 @@ TaskDescriptor* BundleContainer::getTaskByUUID(std::string uuid) {
     return tasks[uuid];
 }
 
+std::string BundleContainer::registerNewContext(ExecutionContext* context) {
+    std::string contextUUID = UUIDGenerator::generateUUID();
+    contexts[contextUUID] = context;
+    return contextUUID;
+}
+
+ExecutionContext* BundleContainer::getContextByUUID(std::string uuid) {
+    return contexts[uuid];
+}
+
+void BundleContainer::setMainContext(ExecutionContext* context) {
+    mainContext = context;
+}
+
+ExecutionContext* BundleContainer::getMainContext() {
+    return mainContext;
+}
+
 BundleContainer::~BundleContainer() {
+    // Execute blocks clear
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+        delete it->second;
+    }
+
+    // Task descriptors clear
+    for (auto it = tasks.begin(); it != tasks.end(); ++it) {
+        delete it->second;
+    }
+
+    // Execution contexts clear
+    for (auto it = contexts.begin(); it != contexts.end(); ++it) {
         delete it->second;
     }
 }

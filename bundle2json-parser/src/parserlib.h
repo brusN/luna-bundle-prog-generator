@@ -60,27 +60,37 @@ public:
 
 class ForSubblock: public IExecuteSubblock {
 private:
-    std::list<IExecuteSubblock *> body;
+    ExecutionContext* body;
     std::string iteratorName;
     long startIndex;
     long endIndex;
 
 public:
-    void addBlockToBody(IExecuteSubblock* newBlock);
+    void setBody(ExecutionContext* context);
+    ExecutionContext* getBody();
+
     void setIteratorName(std::string iteratorName);
     std::string getIteratorName();
+
     void setStartIndex(long startIndex);
     long getStartIndex();
+
     void setEndIndex(long endIndex);
     long getEndIndex();
+
+    std::string buildBodyList();
+    std::string toJSONStruct();
 };
 
-class ExecutionContext {
+class ExecutionContext: public IExecuteSubblock {
 private:
     std::list<IExecuteSubblock*> body;
 
 public:
     void addBlock(IExecuteSubblock* block);
+    std::list<IExecuteSubblock*> getBody();
+
+    std::string toJSONStruct();
 };
 
 class TaskDescriptor {
@@ -103,7 +113,10 @@ private:
     std::map<std::string, std::string> macroVars;
     std::map<std::string, IExecuteSubblock*> blocks;
     std::map<std::string, TaskDescriptor*> tasks;
-    std::map<std::string, 
+    std::map<std::string, ExecutionContext*> contexts;
+
+    // Memory will be cleared with other contexts
+    ExecutionContext* mainContext;
     
 public:
     void registerMacroVar(std::string varName, std::string value);
@@ -114,6 +127,12 @@ public:
 
     std::string registerNewTask(TaskDescriptor* task);
     TaskDescriptor* getTaskByUUID(std::string uuid);
+
+    std::string registerNewContext(ExecutionContext* context);
+    ExecutionContext* getContextByUUID(std::string uuid);
+
+    void setMainContext(ExecutionContext* context);
+    ExecutionContext* getMainContext();
 
     ~BundleContainer();
 };
