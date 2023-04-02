@@ -26,6 +26,6 @@ int main(int argc, char *argv[]) {
     std::ofstream jsonFile(argv[2]);
     JSONHandler JSONHandler;
     JSONHandler.generateJSON(jsonFile, container);
-
+    jsonFile.close();
     return 0;
 }

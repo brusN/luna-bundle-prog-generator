@@ -19,10 +19,10 @@ private:
     std::string buildNameForJSON();
 
 public:
-    std::string getRank() const;
+    std::string& getRank();
     void setRank(std::string rank);
 
-    std::list<std::string> getCfName() const;
+    std::list<std::string>& getCfName();
     void setCfName(std::list<std::string> task);
 
     std::string toJSONStruct();
@@ -35,13 +35,13 @@ private:
     std::string dfName;
 
 public:
-    std::string getFromRank() const;
+    std::string& getFromRank();
     void setFromRank(std::string fromRank);
 
-    std::string getToRank() const;
+    std::string& getToRank();
     void setToRank(std::string toRank);
 
-    std::string getDFName() const;
+    std::string& getDFName();
     void setDFName(std::string dfName);
 
     std::string toJSONStruct();
@@ -52,7 +52,7 @@ private:
     std::string name;
 
 public:
-    std::string getName();
+    std::string& getName();
     void setName(std::string name);
 
     std::string toJSONStruct();
@@ -70,7 +70,7 @@ public:
     ExecutionContext* getBody();
 
     void setIteratorName(std::string iteratorName);
-    std::string getIteratorName();
+    std::string& getIteratorName();
 
     void setStartIndex(long startIndex);
     long getStartIndex();
@@ -78,7 +78,6 @@ public:
     void setEndIndex(long endIndex);
     long getEndIndex();
 
-    std::string buildBodyList();
     std::string toJSONStruct();
 };
 
@@ -88,7 +87,7 @@ private:
 
 public:
     void addBlock(IExecuteSubblock* block);
-    std::list<IExecuteSubblock*> getBody();
+    std::list<IExecuteSubblock*>& getBody();
 
     std::string toJSONStruct();
 };
@@ -98,7 +97,7 @@ private:
     std::list<std::string> name;
 
 public:
-    std::list<std::string> getName();
+    std::list<std::string>& getName();
     void setName(std::list<std::string> name);
     void addNamePart(std::string namePart);
 };
@@ -119,6 +118,7 @@ private:
     ExecutionContext* mainContext;
     
 public:
+    std::map<std::string, std::string>& getMacroVars();
     void registerMacroVar(std::string varName, std::string value);
     std::string getMacroVarValueByName(std::string varName);
 

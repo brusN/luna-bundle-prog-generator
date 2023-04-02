@@ -4,7 +4,7 @@
     ------------- RubSubblock impl -------------
 */
 
-std::string RunSubblock::getRank() const {
+std::string& RunSubblock::getRank() {
     return rank;
 }
 
@@ -12,8 +12,8 @@ void RunSubblock::setRank(std::string rank) {
     this->rank = rank;
 }
 
-std::list<std::string> RunSubblock::getCfName() const {
-    return this->cfName;
+std::list<std::string>& RunSubblock::getCfName() {
+    return cfName;
 }
 
 void RunSubblock::setCfName(std::list<std::string> task) {
@@ -43,7 +43,7 @@ std::string RunSubblock::toJSONStruct() {
     ------------- SendSubblock impl -------------
 */ 
 
-std::string SendSubblock::getFromRank() const {
+std::string& SendSubblock::getFromRank() {
     return fromRank;
 }
 
@@ -51,7 +51,7 @@ void SendSubblock::setFromRank(std::string fromRank) {
     this->fromRank = fromRank;
 }
 
-std::string SendSubblock::getToRank() const {
+std::string& SendSubblock::getToRank() {
     return toRank;
 }
 
@@ -59,7 +59,7 @@ void SendSubblock::setToRank(std::string toRank) {
     this->toRank = toRank;
 }
 
-std::string SendSubblock::getDFName() const {
+std::string& SendSubblock::getDFName() {
     return dfName;
 }
 
@@ -81,7 +81,7 @@ std::string SendSubblock::toJSONStruct() {
     ------------- DefineDataFragmentBlock impl -------------
 */
 
-std::string DefineDataFragmentSubblock::getName() {
+std::string& DefineDataFragmentSubblock::getName() {
     return name;
 }
 
@@ -110,7 +110,7 @@ void ForSubblock::setIteratorName(std::string iteratorName) {
     this->iteratorName = iteratorName;
 }
 
-std::string ForSubblock::getIteratorName() {
+std::string& ForSubblock::getIteratorName() {
     return iteratorName;
 }
 
@@ -130,26 +130,13 @@ long ForSubblock::getEndIndex() {
     return endIndex;
 }
 
-std::string ForSubblock::buildBodyList() {
-    std::string delimiter = ", ";
-    std::string result = "";
-    auto bodyBlockList = body->getBody();
-
-    auto it = bodyBlockList.begin();
-    for (it; it != --bodyBlockList.end(); ++it) {
-        result += (*it)->toJSONStruct() + delimiter;
-    }
-    result += (*it)->toJSONStruct();
-    return result;
-}
-
 std::string ForSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"for\"," + 
                                             "\"iterator\": \"" + iteratorName + "\"," + 
                                             "\"startValue\": " + std::to_string(startIndex) + "," +
                                             "\"endValue\": " + std::to_string(endIndex) +
-                                            "[" + buildBodyList() + "]" + 
+                                            "[" + body->toJSONStruct() + "]" + 
                                             "}";
     return buildString;
 }
@@ -162,16 +149,27 @@ void ExecutionContext::addBlock(IExecuteSubblock* block) {
     body.emplace_back(block);
 }
 
-std::list<IExecuteSubblock*> ExecutionContext::getBody() {
+std::list<IExecuteSubblock*>& ExecutionContext::getBody() {
     return body;
+}
+
+std::string ExecutionContext::toJSONStruct() {
+    std::string delimiter = ", ";
+    std::string result = "{";
+    auto it = body.begin();
+    for (it; it != --body.end(); ++it) {
+        result += (*it)->toJSONStruct() + delimiter;
+    }
+    result += (*it)->toJSONStruct() + "}";
+    return result;
 }
 
 /*
     ------------- TaskDescriptor impl -------------
 */
 
-std::list<std::string> TaskDescriptor::getName() {
-    return this->name;
+std::list<std::string>& TaskDescriptor::getName() {
+    return name;
 }
 
 void TaskDescriptor::setName(std::list<std::string> name) {
@@ -198,6 +196,10 @@ std::string UUIDGenerator::generateUUID() {
 /*
     ------------- Bundle container impl -------------
 */
+
+std::map<std::string, std::string>& BundleContainer::getMacroVars() {
+    return macroVars;
+}
 
 void BundleContainer::registerMacroVar(std::string varName, std::string value) {
     macroVars[varName] = value;
