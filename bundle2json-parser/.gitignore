@@ -2,6 +2,8 @@ bin/
 build/
 files/
 .vscode/
+cmake-build-debug
+.idea
 
 # This is generated from compiling lexer.l and grammar.ypp 
 src/grammar.cpp

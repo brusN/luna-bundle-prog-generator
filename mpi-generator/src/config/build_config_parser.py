@@ -14,6 +14,7 @@ class BuildConfig:
     mpi_header: str
     output: str
 
+
 class BuildConfigParser:
     @classmethod
     def __get_configured_parser(cls):
