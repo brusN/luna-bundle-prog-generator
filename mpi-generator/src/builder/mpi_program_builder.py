@@ -3,76 +3,10 @@ import logging
 import os
 from handler.cpp_file_handler import CPPFileHandler
 from exception.custom_exceptions import OsCommandExecutionException
+from luna_fragments import *
 
 
-class ILunaFragment:
-
-    def to_cpp_src(self):
-        pass
-
-
-class FunctionArgumentDescriptor:
-    type: str
-    name: str
-
-    def to_string(self):
-        return f'{self.type} {self.name}'
-
-
-class CalculationFragmentArgument:
-    def toStr(self):
-        pass
-
-
-class ConstCFArgument(CalculationFragmentArgument):
-    def __init__(self, value):
-        self.value = value
-
-    def toStr(self):
-        return str(self.value)
-
-
-class VarCFArgument(CalculationFragmentArgument):
-    def __init__(self, name):
-        self.name = name
-
-    def toStr(self):
-        return self.name
-
-
-class CodeFragment(ILunaFragment):
-    name: str
-    code: str
-    args: list
-
-    def __init__(self):
-        self.args = []
-
-    def to_cpp_src(self):
-        return f'void {self.code}();'
-
-
-class CalculationFragment(ILunaFragment):
-    name: str
-    code: str
-    args: list
-
-    def __init__(self, name, code):
-        self.name = name
-        self.code = code
-        self.args = []
-
-
-class DataFragment(ILunaFragment):
-    name: str
-
-    def __init__(self, name):
-        self.name = name
-
-    def to_cpp_src(self):
-        return f'DF {self.name};'
-
-
+# Stores parsed fragments from program_recom.ja file
 class LunaFragments:
     data_fragments: dict
     code_fragments: dict
@@ -84,6 +18,7 @@ class LunaFragments:
         self.calculation_fragments = {}
 
 
+# Converter LuNA types to C++ types
 class ArgTypeMapper:
     types_map: dict
 
@@ -100,12 +35,17 @@ class ArgTypeMapper:
         return self.types_map[arg_type]
 
 
+# MPI src generator
 class MPIProgramBuilder:
     def __init__(self, build_config):
+        # Passed required files and information for generating MPI src
         self.build_config = build_config
 
+        # Required binaries from PATH
         self._luna_compiler_path = 'luna'
         self._luna_bundle_parser = 'luna-bundle-parser'
+
+        # LuNA compiler options
         self._luna_build_dir = 'build'
         self._luna_compiler_flags = ['--compile-only', f'--build-dir={self._luna_build_dir}']
 
@@ -114,7 +54,7 @@ class MPIProgramBuilder:
         self._cpp_file_handler = CPPFileHandler(fileName=self.build_config.output)
         self._bundle_json_file_path = self._luna_build_dir + '/prog_bundle.json'
 
-    def compile_luna_prog(self):
+    def _compile_luna_prog(self):
         # Example: luna --compile-only --build-dir=build program.fa
         compile_os_command = '{luna_compiler_path} {luna_compiler_flags} {luna_src_path}'.format(
             luna_compiler_path=self._luna_compiler_path,
@@ -126,7 +66,7 @@ class MPIProgramBuilder:
         if error_code != 0:
             raise OsCommandExecutionException('Error while building LuNA program')
 
-    def get_bundle_json(self):
+    def _get_bundle_json(self):
         compile_os_command = '{luna_bundle_parser} {bundle_path} {output_json_path}'.format(
             luna_bundle_parser=self._luna_bundle_parser,
             bundle_path=self.build_config.bundle_file_path,
@@ -137,7 +77,7 @@ class MPIProgramBuilder:
         if error_code != 0:
             raise OsCommandExecutionException('Error while parsing bundle file')
 
-    def parse_program_recom_json(self):
+    def _parse_program_recom_json(self):
         with open(f'{self._luna_build_dir}/program_recom.ja', 'r') as program_recom_json_file:
             program_recom_json = json.load(program_recom_json_file)
 
@@ -164,7 +104,7 @@ class MPIProgramBuilder:
         for block in prog_body:
             if block['type'] != 'exec':
                 continue
-            fragment = CalculationFragment(block['id'][0], block['code'])
+            fragment = CalculationFragment(block['id'][0], block['code'])  # <<<<<
             cf_args = block['args']
             for arg in cf_args:
                 if arg['type'] == 'iconst':

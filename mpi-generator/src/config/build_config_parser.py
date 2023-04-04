@@ -66,11 +66,13 @@ class BuildConfigParser:
         build_config.luna_src_path = parsed_config_file["luna_src_path"]
         build_config.cpp_codes_path = parsed_config_file["cpp_codes_path"]
 
+        # Setting the default value for mpi_header
         if "mpi_header" not in parsed_config_file:
             build_config.mpi_header = 'mpi.h'
         else:
             build_config.mpi_header = parsed_config_file["mpi_header"]
 
+        # Setting the default value for output
         if "output" not in parsed_config_file:
             build_config.output = './mpi_prog'
         else:
@@ -84,12 +86,14 @@ class BuildConfigParser:
         args = parser.parse_args()
         build_config = BuildConfig()
 
-        # If config file not defined, then getting config values from input args
+        # If file not specified, then reading from passed args
         if args.config_file_path is None:
             return cls.__get_build_config_from_args(args, build_config)
-        # If config file defined
+        # Reading the config from the specified file
         else:
             if not os.path.isfile(args.config_file_path):
                 raise FileExistsError('Config file not found! Check passed config file path')
             config_json_file = open(args.config_file_path, 'r')
-            return cls.__get_build_config_from_file(config_json_file, build_config)
+            parsed_config = cls.__get_build_config_from_file(config_json_file, build_config)
+            config_json_file.close()
+            return parsed_config
