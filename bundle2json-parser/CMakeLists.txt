@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 3.13)  # CMake version check
+cmake_minimum_required(VERSION 3.26)
+project(bundle2json_parser)
 
-project(luna-bundle-parser)               # Create project "simple_example"
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -luuid)
 
-set(CMAKE_CXX_STANDARD 11)            # Enable c++14 standard
-
-# Add main.cpp file of project root directory as source file
-set(SOURCE_FILES main.cpp)
-
-# Add executable target with source files listed in SOURCE_FILES variable
-add_executable(simple_example ${SOURCE_FILES})
+add_executable(bundle2json_parser src/parser.cpp src/parserlib.cpp src/jsonhandler.cpp src/lexer.o src/grammar.cpp)
