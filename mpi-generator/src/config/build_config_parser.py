@@ -13,6 +13,7 @@ class BuildConfig:
     cpp_codes_path: str
     mpi_header: str
     output: str
+    compile_only: bool
 
 
 class BuildConfigParser:
@@ -30,7 +31,9 @@ class BuildConfigParser:
         parser.add_argument('--mpi-header',
                             type=str, help='Including MPI header', default='mpi.h')
         parser.add_argument('-o', '--output',
-                            dest='output', type=str, help='Path to compiled binary', default='./mpi_prog')
+                            dest='output', type=str, help='Path to built binary', default='luna_manual_mpi_program')
+        parser.add_argument('--compile', action='store_true',
+                            help='Just generate MPI src and bundle JSON internal state')
         return parser
 
     @classmethod
@@ -48,6 +51,7 @@ class BuildConfigParser:
         build_config.cpp_codes_path = args.cpp_codes_path
         build_config.mpi_header = args.mpi_header
         build_config.output = args.output
+        build_config.compile = args.compile
 
         return build_config
 
@@ -77,6 +81,12 @@ class BuildConfigParser:
             build_config.output = './mpi_prog'
         else:
             build_config.output = parsed_config_file["output"]
+
+        # Setting the default value for compile flag
+        if "compile" not in parsed_config_file:
+            build_config.mpi_header = True
+        else:
+            build_config.mpi_header = parsed_config_file["compile"] in ['True', 'true']
 
         return build_config
 

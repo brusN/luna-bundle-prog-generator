@@ -1,6 +1,6 @@
 class CPPFileHandler:
-    def __init__(self, fileName):
-        self._file = open(fileName, 'w+')
+    def __init__(self, file_name):
+        self._file = open(file_name, 'w+')
 
     def write_line(self, line):
         self._file.write(f'{line}\n')
@@ -31,7 +31,9 @@ class CPPFileHandler:
         for arg in calculation_fragment.args:
             args += arg.toStr() + ', '
         args = args[:-2]
-        self.write_line(f'if (rank == {rank}) {{ {code_fragment.code}({args});}}')
+        self.write_line(f'if (rank == {rank}) {{ \
+            {code_fragment.code}({args}); \
+        }}')
 
     def include_df_send(self, df_name, from_rank, to_rank):
         self.write_line(f'\

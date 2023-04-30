@@ -35,83 +35,67 @@ class ArgTypeMapper:
         return self.types_map[arg_type]
 
 
-# MPI src generator
 class MPIProgramBuilder:
-    def __init__(self, build_config):
+    def __init__(self, build_config, luna_compiler_path='luna', luna_bundle_parser='luna-bundle-parser',
+                 luna_build_dir='luna_compile_temp', build_dir='build'):
         # Passed required files and information for generating MPI src
         self.build_config = build_config
 
         # Required binaries from PATH
-        self._luna_compiler_path = 'luna'
-        self._luna_bundle_parser = 'luna-bundle-parser'
+        self._luna_compiler_path = luna_compiler_path
+        self._luna_bundle_parser = luna_bundle_parser
 
         # LuNA compiler options
-        self._luna_build_dir = 'build'
+        self._luna_build_dir = luna_build_dir
         self._luna_compiler_flags = ['--compile-only', f'--build-dir={self._luna_build_dir}']
+        self._build_dir = build_dir
 
         self._args_type_mapper = ArgTypeMapper()
         self._data = LunaFragments()
-        self._cpp_file_handler = CPPFileHandler(fileName=self.build_config.output)
-        self._bundle_json_file_path = self._luna_build_dir + '/prog_bundle.json'
+        self._cpp_file_handler = CPPFileHandler(file_name=build_dir + '/' + build_config.output)
+        self._bundle_json_file_path = self._build_dir + '/bundle.json'
+
+    def build(self):
+        self._compile_luna_prog()
+        self._get_bundle_json()
+        self.parse_program_recom_json()
+        self.generate_mpi_src()
+        self.finalize()
 
     def _compile_luna_prog(self):
+        logging.info('Getting meta information about LuNA program')
+
         # Example: luna --compile-only --build-dir=build program.fa
         compile_os_command = '{luna_compiler_path} {luna_compiler_flags} {luna_src_path}'.format(
             luna_compiler_path=self._luna_compiler_path,
             luna_compiler_flags=' '.join(self._luna_compiler_flags),
             luna_src_path=self.build_config.luna_src_path
         )
-        logging.info('Compiling LuNA program >>> ' + compile_os_command)
         error_code = os.system(compile_os_command)
         if error_code != 0:
             raise OsCommandExecutionException('Error while building LuNA program')
 
     def _get_bundle_json(self):
+        logging.info('Converting bundle into JSON internal state')
+
+        # Example: luna-bundle-parser bundle.bndl bundle.json
         compile_os_command = '{luna_bundle_parser} {bundle_path} {output_json_path}'.format(
             luna_bundle_parser=self._luna_bundle_parser,
             bundle_path=self.build_config.bundle_file_path,
             output_json_path=self._bundle_json_file_path,
         )
-        logging.info('Parsing bundle file >>> ' + compile_os_command)
         error_code = os.system(compile_os_command)
         if error_code != 0:
             raise OsCommandExecutionException('Error while parsing bundle file')
 
-    def _parse_program_recom_json(self):
+
+
+    def parse_program_recom_json(self):
         with open(f'{self._luna_build_dir}/program_recom.ja', 'r') as program_recom_json_file:
             program_recom_json = json.load(program_recom_json_file)
 
-        # Parsing import code blocks statements
-        for block_name in program_recom_json:
-            raw = program_recom_json[block_name]
-            if raw['type'] == 'extern':
-                code_fragment = CodeFragment()
-                code_fragment.name = block_name
-                code_fragment.code = raw['code']
-
-                arg_index = 0
-                for arg in raw['args']:
-                    func_arg = FunctionArgumentDescriptor()
-                    func_arg.type = self._args_type_mapper.get_mapped_type(arg['type'])
-                    func_arg.name = 'arg' + str(arg_index)
-                    code_fragment.args.append(func_arg)
-                    arg_index += 1
-
-                self._data.code_fragments[code_fragment.name] = code_fragment
-
-        # Parsing calculation fragments
-        prog_body = program_recom_json['main']['body']
-        for block in prog_body:
-            if block['type'] != 'exec':
-                continue
-            fragment = CalculationFragment(block['id'][0], block['code'])  # <<<<<
-            cf_args = block['args']
-            for arg in cf_args:
-                if arg['type'] == 'iconst':
-                    fragment.args.append(ConstCFArgument(arg['value']))
-                elif arg['type'] == 'id':
-                    fragment.args.append(VarCFArgument(arg['ref'][0]))
-            self._data.calculation_fragments[fragment.name] = fragment
+        self._parse_include_code_fragments(program_recom_json)
+        self._parse_execution_context(program_recom_json['main']['body'])
 
     def _include_headers(self):
         self._cpp_file_handler.include_std_header(self.build_config.mpi_header)
@@ -165,9 +149,6 @@ class MPIProgramBuilder:
         # Main func body end' <--
 
         self._cpp_file_handler.write_line("return 0;}")
-
-    def _define_data_fragments(self, file):
-        pass
 
     def generate_mpi_src(self):
         self._include_headers()

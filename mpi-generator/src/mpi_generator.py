@@ -2,12 +2,12 @@ from builder.mpi_program_compiler import MPIProgramCompiler
 from config.build_config_parser import *
 from builder.mpi_program_builder import *
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format='luna-mpi-generator: [%(levelname)-s]\t%(message)-s')
 
 
 def main():
-    logging.info('Parsing arguments')
     try:
+        logging.debug('Parsing arguments')
         build_config = BuildConfigParser.get_build_config()
     except (PropertyNotDefinedError, FileExistsError) as e:
         logging.error(e)
@@ -15,11 +15,7 @@ def main():
         exit(1)
 
     mpi_builder = MPIProgramBuilder(build_config=build_config)
-    mpi_builder.compile_luna_prog()
-    mpi_builder.get_bundle_json()
-    mpi_builder.parse_program_recom_json()
-    mpi_builder.generate_mpi_src()
-    mpi_builder.finalize()
+    mpi_builder.build(output='luna_mpi_program')
 
     mpi_program_compiler = MPIProgramCompiler()
     mpi_program_compiler.compile(build_config.output, build_config.cpp_codes_path, 'compiled_mpi_prog')
