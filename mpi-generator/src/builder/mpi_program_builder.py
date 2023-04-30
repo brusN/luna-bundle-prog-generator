@@ -3,37 +3,8 @@ import logging
 import os
 from handler.cpp_file_handler import CPPFileHandler
 from exception.custom_exceptions import OsCommandExecutionException
+from handler.program_recom_handler import ProgramRecomHandler
 from luna_fragments import *
-
-
-# Stores parsed fragments from program_recom.ja file
-class LunaFragments:
-    data_fragments: dict
-    code_fragments: dict
-    calculation_fragments: dict
-
-    def __init__(self):
-        self.data_fragments = {}
-        self.code_fragments = {}
-        self.calculation_fragments = {}
-
-
-# Converter LuNA types to C++ types
-class ArgTypeMapper:
-    types_map: dict
-
-    def __init__(self):
-        self.types_map = {
-            'int': 'int',
-            'real': 'double',
-            'string': 'string',
-            'name': 'DF &',
-            'value': 'const DF &'
-        }
-
-    def get_mapped_type(self, arg_type):
-        return self.types_map[arg_type]
-
 
 class MPIProgramBuilder:
     def __init__(self, build_config, luna_compiler_path='luna', luna_bundle_parser='luna-bundle-parser',
@@ -50,15 +21,15 @@ class MPIProgramBuilder:
         self._luna_compiler_flags = ['--compile-only', f'--build-dir={self._luna_build_dir}']
         self._build_dir = build_dir
 
-        self._args_type_mapper = ArgTypeMapper()
-        self._data = LunaFragments()
-        self._cpp_file_handler = CPPFileHandler(file_name=build_dir + '/' + build_config.output)
-        self._bundle_json_file_path = self._build_dir + '/bundle.json'
+        self._luna_fragments = None
+        self._program_recom_handler = ProgramRecomHandler(luna_build_dir=luna_build_dir)
+        self._cpp_file_handler = CPPFileHandler(file_name=f'{build_dir}/{build_config.output}')
+        self._bundle_json_file_path = f'{self._build_dir}/bundle.json'
 
     def build(self):
         self._compile_luna_prog()
         self._get_bundle_json()
-        self.parse_program_recom_json()
+        self._luna_fragments = self._program_recom_handler.parse_program_recom_json()
         self.generate_mpi_src()
         self.finalize()
 
@@ -87,15 +58,6 @@ class MPIProgramBuilder:
         error_code = os.system(compile_os_command)
         if error_code != 0:
             raise OsCommandExecutionException('Error while parsing bundle file')
-
-
-
-    def parse_program_recom_json(self):
-        with open(f'{self._luna_build_dir}/program_recom.ja', 'r') as program_recom_json_file:
-            program_recom_json = json.load(program_recom_json_file)
-
-        self._parse_include_code_fragments(program_recom_json)
-        self._parse_execution_context(program_recom_json['main']['body'])
 
     def _include_headers(self):
         self._cpp_file_handler.include_std_header(self.build_config.mpi_header)
