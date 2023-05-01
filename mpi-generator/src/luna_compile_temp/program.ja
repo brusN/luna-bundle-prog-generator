@@ -1,0 +1,253 @@
+{
+    "hello_world": {
+        "type": "extern",
+        "code": "c_helloWorld",
+        "args": [
+            {
+                "type": "int"
+            }
+        ],
+        "cuda_support": "false",
+        "nocpu": "false"
+    },
+    "init": {
+        "type": "extern",
+        "code": "c_init",
+        "args": [
+            {
+                "type": "name"
+            },
+            {
+                "type": "int"
+            }
+        ],
+        "cuda_support": "false",
+        "nocpu": "false"
+    },
+    "print": {
+        "type": "extern",
+        "code": "c_print",
+        "args": [
+            {
+                "type": "value",
+                "reuse": "False"
+            }
+        ],
+        "cuda_support": "false",
+        "nocpu": "false"
+    },
+    "main": {
+        "type": "struct",
+        "where": {
+            "type": "luna"
+        },
+        "args": [],
+        "body": [
+            {
+                "type": "dfs",
+                "names": [
+                    "x"
+                ]
+            },
+            {
+                "type": "exec",
+                "id": [
+                    "test",
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 1
+                    }
+                ],
+                "code": "init",
+                "args": [
+                    {
+                        "is_expr": true,
+                        "type": "id",
+                        "ref": [
+                            "x"
+                        ],
+                        "begin": 146
+                    },
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 128
+                    }
+                ],
+                "rules": [],
+                "begin": 141
+            },
+            {
+                "type": "exec",
+                "id": [
+                    "testPrint",
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 1
+                    }
+                ],
+                "code": "print",
+                "args": [
+                    {
+                        "is_expr": true,
+                        "type": "id",
+                        "ref": [
+                            "x"
+                        ],
+                        "begin": 179
+                    }
+                ],
+                "rules": [],
+                "begin": 173
+            },
+            {
+                "type": "for",
+                "var": "i",
+                "first": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 0
+                },
+                "last": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 3
+                },
+                "where": {
+                    "type": "luna"
+                },
+                "begin": 184,
+                "body_begin": 195,
+                "body": [
+                    {
+                        "type": "dfs",
+                        "names": []
+                    },
+                    {
+                        "type": "exec",
+                        "id": [
+                            "task1",
+                            {
+                                "is_expr": true,
+                                "type": "id",
+                                "ref": [
+                                    "i"
+                                ],
+                                "begin": 208
+                            }
+                        ],
+                        "code": "init",
+                        "args": [
+                            {
+                                "is_expr": true,
+                                "type": "id",
+                                "ref": [
+                                    "x",
+                                    {
+                                        "is_expr": true,
+                                        "type": "id",
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "begin": 219
+                                    },
+                                    {
+                                        "is_expr": true,
+                                        "type": "id",
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "begin": 222
+                                    }
+                                ],
+                                "begin": 217
+                            },
+                            {
+                                "is_expr": true,
+                                "type": "id",
+                                "ref": [
+                                    "i"
+                                ],
+                                "begin": 226
+                            }
+                        ],
+                        "rules": [],
+                        "begin": 212
+                    }
+                ]
+            },
+            {
+                "type": "for",
+                "var": "i",
+                "first": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 0
+                },
+                "last": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 3
+                },
+                "where": {
+                    "type": "luna"
+                },
+                "begin": 234,
+                "body_begin": 245,
+                "body": [
+                    {
+                        "type": "dfs",
+                        "names": []
+                    },
+                    {
+                        "type": "exec",
+                        "id": [
+                            "task2",
+                            {
+                                "is_expr": true,
+                                "type": "id",
+                                "ref": [
+                                    "i"
+                                ],
+                                "begin": 258
+                            }
+                        ],
+                        "code": "print",
+                        "args": [
+                            {
+                                "is_expr": true,
+                                "type": "id",
+                                "ref": [
+                                    "x",
+                                    {
+                                        "is_expr": true,
+                                        "type": "id",
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "begin": 270
+                                    },
+                                    {
+                                        "is_expr": true,
+                                        "type": "id",
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "begin": 273
+                                    }
+                                ],
+                                "begin": 268
+                            }
+                        ],
+                        "rules": [],
+                        "begin": 262
+                    }
+                ]
+            }
+        ],
+        "begin": 108,
+        "end": 282
+    }
+}

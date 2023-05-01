@@ -1,0 +1,50 @@
+{
+    "0": {
+        "pos": 108,
+        "comment": "initial launcher: sub main()"
+    },
+    "1": {
+        "pos": 108,
+        "comment": "sub main"
+    },
+    "2": {
+        "pos": 141,
+        "comment": "entry (migrate) cf test[1]: init(x, 128);"
+    },
+    "3": {
+        "pos": 173,
+        "comment": "entry (migrate) cf testPrint[1]: print(x);"
+    },
+    "4": {
+        "pos": 173,
+        "comment": "request x"
+    },
+    "5": {
+        "pos": 173,
+        "comment": "execute cf testPrint[1]: print(x);"
+    },
+    "6": {
+        "pos": 184,
+        "comment": "entry (migrate) for i=0..3;"
+    },
+    "7": {
+        "pos": 212,
+        "comment": "entry (migrate) cf task1[i]: init(x[i][i], i);"
+    },
+    "8": {
+        "pos": 234,
+        "comment": "entry (migrate) for i=0..3;"
+    },
+    "9": {
+        "pos": 262,
+        "comment": "entry (migrate) cf task2[i]: print(x[i][i]);"
+    },
+    "10": {
+        "pos": 262,
+        "comment": "request x[i][i]"
+    },
+    "11": {
+        "pos": 262,
+        "comment": "execute cf task2[i]: print(x[i][i]);"
+    }
+}

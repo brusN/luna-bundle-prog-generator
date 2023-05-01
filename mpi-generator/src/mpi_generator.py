@@ -15,10 +15,11 @@ def main():
         exit(1)
 
     mpi_builder = MPIProgramBuilder(build_config=build_config)
-    mpi_builder.build(output='luna_mpi_program')
+    mpi_builder.build()
 
-    mpi_program_compiler = MPIProgramCompiler()
-    mpi_program_compiler.compile(build_config.output, build_config.cpp_codes_path, 'compiled_mpi_prog')
+    if not build_config.buildOnly:
+        mpi_program_compiler = MPIProgramCompiler()
+        mpi_program_compiler.compile(build_config.output, build_config.cpp_codes_path, 'compiled_mpi_prog')
 
 
 if __name__ == '__main__':

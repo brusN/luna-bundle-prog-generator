@@ -1,0 +1,357 @@
+{
+    "hello_world": {
+        "args": [
+            {
+                "type": "int"
+            }
+        ],
+        "code": "c_helloWorld",
+        "cuda_support": "false",
+        "nocpu": "false",
+        "type": "extern"
+    },
+    "init": {
+        "args": [
+            {
+                "type": "name"
+            },
+            {
+                "type": "int"
+            }
+        ],
+        "code": "c_init",
+        "cuda_support": "false",
+        "nocpu": "false",
+        "type": "extern"
+    },
+    "main": {
+        "args": [],
+        "begin": 108,
+        "body": [
+            {
+                "names": [
+                    "x"
+                ],
+                "type": "dfs"
+            },
+            {
+                "args": [
+                    {
+                        "begin": 146,
+                        "is_expr": true,
+                        "ref": [
+                            "x"
+                        ],
+                        "type": "id"
+                    },
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 128
+                    }
+                ],
+                "begin": 141,
+                "code": "init",
+                "id": [
+                    "test",
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 1
+                    }
+                ],
+                "rules": [
+                    {
+                        "begin": 141,
+                        "items": [
+                            [
+                                "x"
+                            ]
+                        ],
+                        "property": "req_unlimited",
+                        "ruletype": "enum"
+                    }
+                ],
+                "type": "exec"
+            },
+            {
+                "args": [
+                    {
+                        "begin": 179,
+                        "is_expr": true,
+                        "ref": [
+                            "x"
+                        ],
+                        "type": "id"
+                    }
+                ],
+                "begin": 173,
+                "code": "print",
+                "id": [
+                    "testPrint",
+                    {
+                        "is_expr": true,
+                        "type": "iconst",
+                        "value": 1
+                    }
+                ],
+                "rules": [
+                    {
+                        "begin": 173,
+                        "items": [],
+                        "property": "req_unlimited",
+                        "ruletype": "enum"
+                    },
+                    {
+                        "begin": 173,
+                        "items": [
+                            [
+                                "x"
+                            ]
+                        ],
+                        "property": "request",
+                        "ruletype": "enum"
+                    }
+                ],
+                "type": "exec"
+            },
+            {
+                "begin": 184,
+                "body": [
+                    {
+                        "names": [],
+                        "type": "dfs"
+                    },
+                    {
+                        "args": [
+                            {
+                                "begin": 217,
+                                "is_expr": true,
+                                "ref": [
+                                    "x",
+                                    {
+                                        "begin": 219,
+                                        "is_expr": true,
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "type": "id"
+                                    },
+                                    {
+                                        "begin": 222,
+                                        "is_expr": true,
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "type": "id"
+                                    }
+                                ],
+                                "type": "id"
+                            },
+                            {
+                                "begin": 226,
+                                "is_expr": true,
+                                "ref": [
+                                    "i"
+                                ],
+                                "type": "id"
+                            }
+                        ],
+                        "begin": 212,
+                        "code": "init",
+                        "id": [
+                            "task1",
+                            {
+                                "begin": 208,
+                                "is_expr": true,
+                                "ref": [
+                                    "i"
+                                ],
+                                "type": "id"
+                            }
+                        ],
+                        "rules": [
+                            {
+                                "begin": 212,
+                                "items": [
+                                    [
+                                        "x",
+                                        {
+                                            "begin": 219,
+                                            "is_expr": true,
+                                            "ref": [
+                                                "i"
+                                            ],
+                                            "type": "id"
+                                        },
+                                        {
+                                            "begin": 222,
+                                            "is_expr": true,
+                                            "ref": [
+                                                "i"
+                                            ],
+                                            "type": "id"
+                                        }
+                                    ]
+                                ],
+                                "property": "req_unlimited",
+                                "ruletype": "enum"
+                            }
+                        ],
+                        "type": "exec"
+                    }
+                ],
+                "body_begin": 195,
+                "first": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 0
+                },
+                "last": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 3
+                },
+                "rules": [
+                    {
+                        "begin": 184,
+                        "items": [],
+                        "property": "req_unlimited",
+                        "ruletype": "enum"
+                    }
+                ],
+                "type": "for",
+                "var": "i",
+                "where": {
+                    "type": "luna"
+                }
+            },
+            {
+                "begin": 234,
+                "body": [
+                    {
+                        "names": [],
+                        "type": "dfs"
+                    },
+                    {
+                        "args": [
+                            {
+                                "begin": 268,
+                                "is_expr": true,
+                                "ref": [
+                                    "x",
+                                    {
+                                        "begin": 270,
+                                        "is_expr": true,
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "type": "id"
+                                    },
+                                    {
+                                        "begin": 273,
+                                        "is_expr": true,
+                                        "ref": [
+                                            "i"
+                                        ],
+                                        "type": "id"
+                                    }
+                                ],
+                                "type": "id"
+                            }
+                        ],
+                        "begin": 262,
+                        "code": "print",
+                        "id": [
+                            "task2",
+                            {
+                                "begin": 258,
+                                "is_expr": true,
+                                "ref": [
+                                    "i"
+                                ],
+                                "type": "id"
+                            }
+                        ],
+                        "rules": [
+                            {
+                                "begin": 262,
+                                "items": [],
+                                "property": "req_unlimited",
+                                "ruletype": "enum"
+                            },
+                            {
+                                "begin": 262,
+                                "items": [
+                                    [
+                                        "x",
+                                        {
+                                            "begin": 270,
+                                            "is_expr": true,
+                                            "ref": [
+                                                "i"
+                                            ],
+                                            "type": "id"
+                                        },
+                                        {
+                                            "begin": 273,
+                                            "is_expr": true,
+                                            "ref": [
+                                                "i"
+                                            ],
+                                            "type": "id"
+                                        }
+                                    ]
+                                ],
+                                "property": "request",
+                                "ruletype": "enum"
+                            }
+                        ],
+                        "type": "exec"
+                    }
+                ],
+                "body_begin": 245,
+                "first": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 0
+                },
+                "last": {
+                    "is_expr": true,
+                    "type": "iconst",
+                    "value": 3
+                },
+                "rules": [
+                    {
+                        "begin": 234,
+                        "items": [],
+                        "property": "req_unlimited",
+                        "ruletype": "enum"
+                    }
+                ],
+                "type": "for",
+                "var": "i",
+                "where": {
+                    "type": "luna"
+                }
+            }
+        ],
+        "end": 282,
+        "type": "struct",
+        "where": {
+            "type": "luna"
+        }
+    },
+    "print": {
+        "args": [
+            {
+                "reuse": "False",
+                "type": "value"
+            }
+        ],
+        "code": "c_print",
+        "cuda_support": "false",
+        "nocpu": "false",
+        "type": "extern"
+    }
+}

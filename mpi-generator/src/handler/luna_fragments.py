@@ -19,20 +19,26 @@ class CodeFragment(ILunaFragment):
 
 class CalculationFragment(ILunaFragment):
     name: str
+    ref: []
     code: str
     args: list
 
-    def __init__(self, name, code):
+    def __init__(self, name, ref, code):
         self.name = name
+        self.ref = ref
         self.code = code
         self.args = []
 
 
 class DataFragment(ILunaFragment):
     name: str
+    refs: []
 
     def __init__(self, name):
         self.name = name
+
+    def add_ref(self, ref):
+        self.refs.add(ref)
 
     def to_cpp_src(self):
         return f'DF {self.name};'
@@ -62,8 +68,15 @@ class ConstCFArgument(CalculationFragmentArgument):
 
 
 class VarCFArgument(CalculationFragmentArgument):
-    def __init__(self, name):
+    name: str
+    ref: []
+
+    def __init__(self, name, ref):
         self.name = name
+        self.ref = ref
 
     def to_str(self):
-        return self.name
+        result = self.name
+        for ref_part in self.ref:
+            result += f'[{ref_part}]'
+        return result

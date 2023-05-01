@@ -4,7 +4,7 @@ import os
 from handler.cpp_file_handler import CPPFileHandler
 from exception.custom_exceptions import OsCommandExecutionException
 from handler.program_recom_handler import ProgramRecomHandler
-from luna_fragments import *
+
 
 class MPIProgramBuilder:
     def __init__(self, build_config, luna_compiler_path='luna', luna_bundle_parser='luna-bundle-parser',
@@ -23,15 +23,28 @@ class MPIProgramBuilder:
 
         self._luna_fragments = None
         self._program_recom_handler = ProgramRecomHandler(luna_build_dir=luna_build_dir)
-        self._cpp_file_handler = CPPFileHandler(file_name=f'{build_dir}/{build_config.output}')
+
+        logging.debug('Working directory is ' + os.getcwd())
+        self._create_build_folders()
+        self._cpp_file_handler = CPPFileHandler(file_name=f'{build_dir}/luna_manual_mpi_program_src.cpp')
         self._bundle_json_file_path = f'{self._build_dir}/bundle.json'
 
     def build(self):
         self._compile_luna_prog()
         self._get_bundle_json()
         self._luna_fragments = self._program_recom_handler.parse_program_recom_json()
-        self.generate_mpi_src()
-        self.finalize()
+        logging.debug('Build has finished')
+        # self.generate_mpi_src()
+        # self.finalize()
+
+    def _create_build_folders(self):
+        if not os.path.exists(self._build_dir):
+            os.mkdir(self._build_dir)
+        if not os.path.exists(self._luna_build_dir):
+            os.mkdir(self._luna_build_dir)
+
+    def _clean(self):
+        pass
 
     def _compile_luna_prog(self):
         logging.info('Getting meta information about LuNA program')
@@ -42,6 +55,7 @@ class MPIProgramBuilder:
             luna_compiler_flags=' '.join(self._luna_compiler_flags),
             luna_src_path=self.build_config.luna_src_path
         )
+        os.system('echo $SHELL')
         error_code = os.system(compile_os_command)
         if error_code != 0:
             raise OsCommandExecutionException('Error while building LuNA program')

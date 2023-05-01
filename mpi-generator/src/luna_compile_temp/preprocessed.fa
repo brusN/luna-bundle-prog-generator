@@ -1,0 +1,16 @@
+import c_helloWorld(int) as hello_world;
+import c_init(name, int) as init;
+import c_print(value) as print;
+
+sub main()
+{
+	df x;
+	cf test[1]: init(x, 128);
+	cf testPrint[1]: print(x);
+	for i=0..3 {
+		cf task1[i]: init(x[i][i], i);
+	}
+	for i=0..3 {
+		cf task2[i]: print(x[i][i]);
+	}
+}
