@@ -86,7 +86,7 @@ class BuildConfigParser:
         if "buildOnly" not in parsed_config_file:
             build_config.buildOnly = True
         else:
-            build_config.buildOnly = parsed_config_file["buildOnly"] in ['True', 'true']
+            build_config.buildOnly = parsed_config_file["buildOnly"]
 
         return build_config
 

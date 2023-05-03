@@ -55,7 +55,6 @@ class MPIProgramBuilder:
             luna_compiler_flags=' '.join(self._luna_compiler_flags),
             luna_src_path=self.build_config.luna_src_path
         )
-        os.system('echo $SHELL')
         error_code = os.system(compile_os_command)
         if error_code != 0:
             raise OsCommandExecutionException('Error while building LuNA program')
