@@ -1,6 +1,7 @@
 import json
 import logging
 
+from src.exception.custom_exceptions import SyntaxErrorException
 from src.handler.luna_fragments import DataFragment, CalculationFragment, VarCFArgument, ConstCFArgument, CodeFragment, \
     FunctionArgumentDescriptor
 
@@ -51,41 +52,25 @@ class ProgramRecomHandler:
         pass
 
     def _register_calc_fragment(self, block, iterator_context):
-        # Creating calc fragment, creating his ref if he has
-        cf_ref = []
-        for ref_part in block['id'][1:]:
-            if ref_part['type'] == 'iconst':
-                cf_ref.append(ref_part['value'])
-            elif ref_part['type'] == 'id':
-                cf_ref.append(ref_part['ref'][0])
-        calc_fragment = CalculationFragment(block['id'][0], cf_ref, block['code'])
+        if len(iterator_context) == 0:
+            cf_name = block['id'][0]
+            cf_refs = block['id'][1:0]
+            for cf_ref_part in cf_refs:
+                if cf_ref_part['type'] != 'iconst':
+                    raise SyntaxErrorException('Using iterator in cf ref outside for loop context')
+            calc_fragment = CalculationFragment(cf_name, cf_refs, block['code'])
+            self._data.calculation_fragments[cf_name] = calc_fragment
+
+            args = block['args']
+            for arg in args:
+                if arg['type'] != 'iconst':
+                    raise SyntaxErrorException('Using iterator in cf argument ref outside for loop context')
+        else:
 
         # Handling cf args
         cf_args = block['args']
         for arg in cf_args:
-
-            # Ref part represents const number
-            if arg['type'] == 'iconst':
-                calc_fragment.args.append(ConstCFArgument(arg['value']))
-
-            # Ref part represents iterator or df with reference
-            elif arg['type'] == 'id':
-
-                # Building cf arg reference
-                cf_arg_ref = []
-                for cf_ref_part in arg['ref'][1:]:
-
-                    # Const reference part, example x[0]
-                    if cf_ref_part['type'] == 'iconst':
-                        cf_arg_ref.append(cf_ref_part['value'])
-                    # Var reference part, example x[i]
-                    elif cf_ref_part['type'] == 'id':
-                        cf_arg_ref.append(cf_ref_part['ref'][0])
-
-                var_cf_arg = VarCFArgument(arg['ref'][0], cf_arg_ref)
-
-                # Adding cf arg
-                calc_fragment.args.append(var_cf_arg)
+            calc_fragment.args.append(arg)
 
         # 1. Раскрыть i-ость в конкретные значения
         # 2. Зарегистрировать ссылочные df
@@ -98,8 +83,6 @@ class ProgramRecomHandler:
         for cur_value in range(0, cartesian_set_size):
 
 
-
-        # self._data.calculation_fragments[calc_fragment.name] = calc_fragment
 
     def _register_for_block(self, block, iterator_context):
 
