@@ -33,6 +33,47 @@ class ArgTypeMapper:
         return cls.types_map[arg_type]
 
 
+class CurValueIteratorDescriptor:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+
+class IteratorDescriptor:
+    def __init__(self, name, start_value, end_value):
+        self.name = name
+        self.start_value = start_value
+        self.end_value = end_value
+        self.cur_value = start_value
+
+
+class IteratorContext:
+    def __init__(self):
+        self.iterators = dict()
+
+    def add_iterator(self, it_desc):
+        self.iterators.append(it_desc)
+
+    def remove_iterator(self, it_name):
+        del self.iterators[it_name]
+
+    def get_cur_iter_values(self):
+        cur_values = []
+        for iter in self.iterators:
+            cur_values.append(CurValueIteratorDescriptor(iter.name, iter.start_value))
+        return cur_values
+
+    def update_cur_iter_values(self, cur_iter_values):
+        for cur_iter_value in cur_iter_values:
+            self.iterators[cur_iter_value.name].cur_value = cur_iter_value.value
+
+    def get_cartesian_size(self):
+        size = 1
+        for iter in self.iterators:
+            size *= iter.end_value - iter.start_value + 1
+        return size
+
+
 class ProgramRecomHandler:
     def __init__(self, luna_build_dir):
         self._data = None
@@ -48,52 +89,87 @@ class ProgramRecomHandler:
         if var_cf_arg.ref not in df.refs:
             df.refs.append(var_cf_arg.ref)
 
-    def _expand_for(self, cf, cur_iterator_values, iterator_context):
-        pass
+    def _inc_cur_iter_values(self, iterator_context, cur_iter_values):
+        cur_iter_values[-1].value += 1
+        for i in reversed(range(len(cur_iter_values))):
+            if cur_iter_values[i].value > iterator_context[cur_iter_values[i].name][1]:
+                cur_iter_values[i].value = 0
+                if i != 0:
+                    cur_iter_values[i - 1].value += 1
+                else:
+                    break
+
+
+    def _build_cf_ref(self, block, iterator_context):
+        cf_ref = []
+        for cf_ref_part in block['id'][1:0]:
+            # If const, then get his value
+            if cf_ref_part['type'] == 'iconst':
+                cf_ref.append(cf_ref_part['value'])
+
+            # If iterator, then take his cur value like const
+            elif cf_ref_part['type'] == 'id':
+                iter_name = cf_ref_part['id'][0]
+                if iter_name not in iterator_context:
+                    raise SyntaxErrorException('Unknown iterator in cf ref')
+                cf_ref.append(iterator_context.iterators[iter_name].cur_value)
+        return cf_ref
+
+
+    def _build_cf_args(self, block, iterator_context):
+        args = []
+        for arg in block['args']:
+            if arg['type'] == 'iconst':
+                args.append(ConstCFArgument(arg['value']))
+            elif arg['type'] == 'id':
+                if len(block['args']) == 1:
+                    args.append(ConstCFArgument(iterator_context.iterators[arg['ref'][0]].cur_value))
+                else:
+                    cf_arg_ref = []
+                    for cf_arg_ref_part in arg['ref'][1:0]:
+                        if cf_arg_ref_part['type'] == 'iconst':
+                            cf_arg_ref.append(cf_arg_ref_part['value'])
+                        elif cf_arg_ref_part['type'] == 'id':
+                            if len(cf_arg_ref_part['ref']) > 1:
+                                raise SyntaxErrorException('Using inherit ref')
+                            cf_arg_ref.append(iterator_context.iterators[cf_arg_ref_part['ref'][0]].cur_value)
+                    args.append(VarCFArgument(arg['ref'][0], cf_arg_ref))
+
+                    # Check if df exists
+                    df_name = arg['ref'][0]
+                    if df_name not in self._data.data_fragments:
+                        raise SyntaxErrorException('Using no defined df ref')
+                    if cf_arg_ref not in self._data.data_fragments[df_name].refs:
+                        self._data.data_fragments[df_name].refs.append(cf_arg_ref)
+        return args
 
     def _register_calc_fragment(self, block, iterator_context):
-        if len(iterator_context) == 0:
-            cf_name = block['id'][0]
-            cf_refs = block['id'][1:0]
-            for cf_ref_part in cf_refs:
-                if cf_ref_part['type'] != 'iconst':
-                    raise SyntaxErrorException('Using iterator in cf ref outside for loop context')
-            calc_fragment = CalculationFragment(cf_name, cf_refs, block['code'])
-            self._data.calculation_fragments[cf_name] = calc_fragment
+        if len(iterator_context) > 0:
+            cur_iter_values = iterator_context.get_cur_iter_values()
+            for i in range(iterator_context.get_cartesian_size()):
+                # string = ''
+                # for value in cur_iter_values:
+                #     string += f'{value.value}, '
+                # print(string) <--- for debug
+                iterator_context.update_cur_iter_values(cur_iter_values)
 
-            args = block['args']
-            for arg in args:
-                if arg['type'] != 'iconst':
-                    raise SyntaxErrorException('Using iterator in cf argument ref outside for loop context')
+                cf = CalculationFragment(block['id'][0], self._build_cf_ref(block, iterator_context), block['code'])
+                cf.args = self._build_cf_args(block, iterator_context)
+                self._inc_cur_iter_values(iterator_context, cur_iter_values)
         else:
-
-        # Handling cf args
-        cf_args = block['args']
-        for arg in cf_args:
-            calc_fragment.args.append(arg)
-
-        # 1. Раскрыть i-ость в конкретные значения
-        # 2. Зарегистрировать ссылочные df
-        cartesian_set_size = 1
-        cur_iter_values = dict()
-        for iterator in iterator_context:
-            it_descriptor = iterator_context[iterator]
-            cur_iter_values[iterator] = it_descriptor[0]
-            cartesian_set_size *= it_descriptor[1] - it_descriptor[0] + 1
-        for cur_value in range(0, cartesian_set_size):
-
-
+            cf = CalculationFragment(block['id'][0], cf_ref, )
 
     def _register_for_block(self, block, iterator_context):
 
         # Adding iterator with start/end values into current for block context
-        iterator_context[block['var']] = [block['first']['value'], block['last']['value']]
+        it_desc = IteratorDescriptor(block['var'], block['first']['value'], block['last']['value'])
+        iterator_context.add_iterator(it_desc)
 
-        # Parse for body
+        # Parse for block body
         self._parse_execution_context(block['body'], iterator_context)
 
         # Remove iterator from context
-        del iterator_context[block['var']]
+        iterator_context.remove_iterator(it_desc.name)
 
     def _parse_execution_context(self, context, iterator_context):
         for block in context:
@@ -133,7 +209,6 @@ class ProgramRecomHandler:
 
         self._data = LunaFragments()
         self._parse_include_code_fragments(program_recom_json)
-        var_context = dict()
-        self._parse_execution_context(program_recom_json['main']['body'], var_context)
+        self._parse_execution_context(program_recom_json['main']['body'], IteratorContext())
 
         return self._data
