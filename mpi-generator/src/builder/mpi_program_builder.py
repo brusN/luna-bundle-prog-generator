@@ -33,6 +33,7 @@ class MPIProgramBuilder:
         self._compile_luna_prog()
         self._get_bundle_json()
         self._luna_fragments = self._program_recom_handler.parse_program_recom_json()
+
         logging.debug('Build has finished')
         # self.generate_mpi_src()
         # self.finalize()
