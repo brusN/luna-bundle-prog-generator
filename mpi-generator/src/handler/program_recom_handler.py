@@ -116,7 +116,7 @@ class ProgramRecomHandler:
             if arg['type'] == 'iconst':
                 args.append(ConstCFArgument(arg['value']))
             elif arg['type'] == 'id':
-                if len(block['args']) == 1:
+                if len(arg['ref']) == 1:
                     if arg['ref'][0] in iterator_context.iterators:
                         args.append(ConstCFArgument(iterator_context.iterators[arg['ref'][0]].cur_value))
                     else:

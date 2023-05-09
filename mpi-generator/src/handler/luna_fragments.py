@@ -50,20 +50,22 @@ class CalculationFragmentArgument:
 
 
 class ConstCFArgument(CalculationFragmentArgument):
+
     def __init__(self, value):
         self.value = value
+        self.type = 'const'
 
     def to_str(self):
         return str(self.value)
 
 
 class VarCFArgument(CalculationFragmentArgument):
-    name: str
-    ref: []
+    type = 'var'
 
     def __init__(self, name, ref):
         self.name = name
         self.ref = ref
+        self.type = 'var'
 
     def to_str(self):
         result = self.name

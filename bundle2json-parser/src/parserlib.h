@@ -32,6 +32,17 @@ public:
     void addNamePart(std::string namePart);
 };
 
+class DFDescriptor {
+private:
+    std::list<std::string> name;
+
+public:
+    std::list<std::string>& getName();
+    void setName(std::list<std::string> name);
+    void addNamePart(std::string namePart);
+    std::string to_cf_json_name();
+};
+
 class UUIDGenerator {
 public:
     static std::string generateUUID() {
@@ -64,7 +75,7 @@ class SendSubblock: public IExecuteSubblock {
 private:
     std::string fromRank;
     std::string toRank;
-    std::string dfName;
+    DFDescriptor* dfd;
 
 public:
     std::string& getFromRank();
@@ -73,8 +84,8 @@ public:
     std::string& getToRank();
     void setToRank(std::string toRank);
 
-    std::string& getDFName();
-    void setDFName(std::string dfName);
+    DFDescriptor* getDFD();
+    void setDFD(DFDescriptor* dfd);
 
     std::string toJSONStruct();
 };
@@ -113,12 +124,15 @@ public:
     std::string toJSONStruct();
 };
 
+
+
 class BundleContainer {
 private:
     std::map<std::string, std::string> macroVars;
     std::map<std::string, IExecuteSubblock*> blocks;
     std::map<std::string, TaskDescriptor*> tasks;
     std::map<std::string, ExecutionContext*> contexts;
+    std::map<std::string, DFDescriptor*> dfs;
 
     // Memory will be cleared with other contexts
     ExecutionContext* mainContext;
@@ -139,6 +153,9 @@ public:
 
     void setMainContext(ExecutionContext* context);
     ExecutionContext* getMainContext();
+
+    std::string registerNewDFD(DFDescriptor* dfd);
+    DFDescriptor* getDFDByUUID(std::string uuid);
 
     ~BundleContainer();
 };

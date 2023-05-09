@@ -71,9 +71,9 @@ for_block: KW_FOR VARIABLE EQUAL var_or_value_or_macro KW_DOUBLE_DOT var_or_valu
      $$ = uuid;
 };
 
-send_block: KW_SEND VARIABLE KW_FROM var_or_value_or_macro KW_TO var_or_value_or_macro SEMICOLON {
+send_block: KW_SEND df_name KW_FROM var_or_value_or_macro KW_TO var_or_value_or_macro SEMICOLON {
      SendSubblock * block = new SendSubblock();
-     block->setDFName($2);
+     block->setDFD(container.getDFDByUUID($2));
      block->setFromRank($4);
      block->setToRank($6);
      std::string uuid = container.registerNewBlock(block);
@@ -107,6 +107,17 @@ task_name: VARIABLE {
      $$ = $1;
 };
 
+df_name: VARIABLE {
+     DFDescriptor* dfd = new DFDescriptor();
+     dfd->addNamePart($1);
+     std::string uuid = container.registerNewDFD(dfd);
+     $$ = uuid;
+} | df_name LSB var_or_value_or_macro RSB {
+     DFDescriptor* dfd = container.getDFDByUUID($1);
+     dfd->addNamePart($3);
+     $$ = $1;
+};
+
 macro_var: BUCK VARIABLE {
      std::string value = container.getMacroVarValueByName($2);
      $$ = value;   
@@ -117,4 +128,5 @@ var_or_value_or_macro:
      | NUMBER { $$ = $1; }
      | macro_var { $$ = $1; }
 ;
+
 %%

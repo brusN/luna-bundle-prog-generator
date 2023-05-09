@@ -59,18 +59,18 @@ void SendSubblock::setToRank(std::string toRank) {
     this->toRank = toRank;
 }
 
-std::string& SendSubblock::getDFName() {
-    return dfName;
+DFDescriptor* SendSubblock::getDFD() {
+    return dfd;
 }
 
-void SendSubblock::setDFName(std::string dfName) {
-    this->dfName = dfName;
+void SendSubblock::setDFD(DFDescriptor* dfd) {
+    this->dfd = dfd;
 }
 
 std::string SendSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"send\"," + 
-                                            "\"data\": \"" + dfName + "\"," + 
+                                            "\"data\": " + dfd->to_cf_json_name() + "," +
                                             "\"from\": " + "\"" + fromRank + "\"" + "," +
                                             "\"to\": " + "\"" + toRank + "\"" + 
                                             "}";
@@ -181,6 +181,32 @@ void TaskDescriptor::addNamePart(std::string namePart) {
 }
 
 /*
+    ------------- DFDescriptor impl -------------
+*/
+
+std::list<std::string>& DFDescriptor::getName() {
+    return name;
+}
+
+void DFDescriptor::setName(std::list<std::string> name) {
+    this->name = name;
+}
+
+void DFDescriptor::addNamePart(std::string namePart) {
+    name.emplace_back(namePart);
+}
+
+std::string DFDescriptor::to_cf_json_name() {
+    auto dfNameIterator = name.begin();
+    std::string dfName = "[\"" + *dfNameIterator + "\"";
+    for (++dfNameIterator; dfNameIterator != name.end(); ++dfNameIterator) {
+        dfName += ", \"" + *dfNameIterator + "\"";
+    }
+    dfName += "]";
+    return dfName;
+}
+
+/*
     ------------- Bundle container impl -------------
 */
 
@@ -217,6 +243,17 @@ TaskDescriptor* BundleContainer::getTaskByUUID(std::string uuid) {
     return tasks[uuid];
 }
 
+std::string BundleContainer::registerNewDFD(DFDescriptor* dfd) 
+{
+    std::string dfdUUID = UUIDGenerator::generateUUID();
+    dfs[dfdUUID] = dfd;
+    return dfdUUID; 
+}
+
+DFDescriptor* BundleContainer::getDFDByUUID(std::string uuid) {
+    return dfs[uuid];
+}
+
 std::string BundleContainer::registerNewContext(ExecutionContext* context) {
     std::string contextUUID = UUIDGenerator::generateUUID();
     contexts[contextUUID] = context;
@@ -248,6 +285,10 @@ BundleContainer::~BundleContainer() {
 
     // Execution contexts clear
     for (auto it = contexts.begin(); it != contexts.end(); ++it) {
+        delete it->second;
+    }
+
+    for (auto it = dfs.begin(); it != dfs.end(); ++it) {
         delete it->second;
     }
 }
