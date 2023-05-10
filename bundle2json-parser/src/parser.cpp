@@ -1,6 +1,4 @@
 #include <iostream>
-#include <fstream>
-#include <map>
 #include <cstdio>
 #include "jsonhandler.h"
 
@@ -12,8 +10,7 @@ extern BundleContainer container;
 int main(int argc, char *argv[]) {
 
     // Parsing from file
-
-    FILE *input = std::fopen("files/input.bndl", "r");
+    FILE *input = std::fopen(argv[1], "r");
     if (!input) {
         fprintf(stderr, "Can't open the input file\n");
         return 1;
@@ -23,9 +20,9 @@ int main(int argc, char *argv[]) {
     yyparse();
     std::fclose(input);
 
-    std::ofstream jsonFile("files/bundle.json");
+    std::ofstream jsonFile(argv[2]);
     JSONHandler JSONHandler;
     JSONHandler.generateJSON(jsonFile, container);
-
+    jsonFile.close();
     return 0;
 }

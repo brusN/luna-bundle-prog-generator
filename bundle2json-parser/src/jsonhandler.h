@@ -11,7 +11,7 @@ public:
 
 class JSONHandler: public IJSONHandler {
 private:
-    std::string buildValueString(std::string lvalue, std::string rvalue);
+    std::string buildKeyValueString(std::string lvalue, std::string rvalue);
 
 public:
     void generateJSON(std::ofstream &outputFile, BundleContainer &lunaBundle);

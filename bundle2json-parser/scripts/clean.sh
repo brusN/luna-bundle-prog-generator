@@ -1,0 +1,1 @@
+rm src/lexer.o

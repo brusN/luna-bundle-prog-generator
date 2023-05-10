@@ -18,6 +18,7 @@ int yyerror(char* msg);
 %%
     /* Main blocks */
 "define"                      { return KW_DEFINE; }
+"df"                          { return KW_DF; }
 "execution"                   { return KW_EXECUTION; }
 
     /* Sub blocks */
@@ -27,10 +28,13 @@ int yyerror(char* msg);
 
 "send"                        { return KW_SEND; }
 "on"                          { return KW_ON; }
-"rank"                       { return KW_RANKS; }
+"rank"                        { return KW_RANK; }
+
+"for"                         { return KW_FOR; }
+".."                          { return KW_DOUBLE_DOT; }
 
     /* Symbols */
-[0-9]+                        { yylval = std::string(yytext); return DIGIT; }
+[0-9]+                        { yylval = std::string(yytext); return NUMBER; }
 [A-Za-z_][A-Za-z0-9_]*        { yylval = std::string(yytext); return VARIABLE; }
 "$"                           { return BUCK; }
 "{"                           { return LCB; }
@@ -39,6 +43,7 @@ int yyerror(char* msg);
 "]"                           { return RSB; }
 "="                           { return EQUAL; }
 ";"                           { return SEMICOLON; }
+
 [ \n\t]                       {}
 .                             {}
 
