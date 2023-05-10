@@ -36,7 +36,6 @@ public:
     void addNewDF(DFDescriptor* dfDescriptor);
     DFDescriptor* getDFDescriptor(std::string dfName);
     DF* getDFByFullName(std::list<std::string> name);
-
     ~DFManager();
 };
 
