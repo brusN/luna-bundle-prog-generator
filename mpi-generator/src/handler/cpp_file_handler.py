@@ -40,7 +40,7 @@ class CPPFileHandler:
                 cpp_list_define = f'"{arg.name}"'
                 for cf_ref_part in arg.ref:
                     cpp_list_define += f', "{cf_ref_part}"'
-                args += f'dfManager.getDFByFullName({{ {cpp_list_define} }}), '
+                args += f'*dfManager.getDFByFullName({{ {cpp_list_define} }}), '
         args = args[:-2]
         self.write_line(f'if (rank == {rank}) {{ \
             {code_fragment.code}({args}); \
@@ -59,11 +59,12 @@ class CPPFileHandler:
             MPI_Send({temp_ref_name}_buff, {temp_ref_name}->get_serialization_size(), MPI_BYTE, 1, {from_rank}, MPI_COMM_WORLD); \
             free({temp_ref_name}_buff); \
         }} else if (rank == {to_rank}) {{ \
+            DF* {temp_ref_name} = dfManager.getDFByFullName({{ {cpp_list_define} }}); \
             MPI_Status status; \
             MPI_Probe(0, 0, MPI_COMM_WORLD, &status); \
             int serializationSize; \
             MPI_Get_count(&status, MPI_BYTE, &serializationSize); \
-            void * buff = malloc(x.get_serialization_size()); \
+            void * buff = malloc({temp_ref_name}->get_serialization_size()); \
             MPI_Recv(buff, serializationSize, MPI_BYTE, 0, {from_rank}, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
             {temp_ref_name}->deserialize(buff, serializationSize); \
             free(buff); \

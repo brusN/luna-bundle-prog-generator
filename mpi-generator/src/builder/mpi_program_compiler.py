@@ -22,6 +22,7 @@ class MPIProgramCompiler(IProgramCompiler):
         bundle_lib_src_headers_path = self._bundle_home_path + '/mpi-generator/include'
 
         # Include luna src headers
+        os.system('clang-format -style=Google -i build/luna_manual_mpi_program_src.cpp')
         os_command = f'{self._mpi_compiler} build/luna_manual_mpi_program_src.cpp {ucodes_cpp} -I {luna_src_headers_path} -I {bundle_lib_src_headers_path} '
 
         # Including luna src dependencies
@@ -31,7 +32,7 @@ class MPIProgramCompiler(IProgramCompiler):
 
         bundle_lib_dependencies = {'dfmanager.cpp'}
         for dependency in bundle_lib_dependencies:
-            os_command += f'{bundle_lib_src_headers_path}/{dependency}'
+            os_command += f'{bundle_lib_src_headers_path}/{dependency} '
 
         # Specify output name
         os_command += f'-o {output_name}'

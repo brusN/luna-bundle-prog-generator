@@ -69,6 +69,16 @@ class IteratorContext:
             size *= self.iterators[iter].end_value - self.iterators[iter].start_value + 1
         return size
 
+    def inc_cur_iter_values(self, cur_iter_values):
+        cur_iter_values[-1].value += 1
+        for i in reversed(range(len(cur_iter_values))):
+            if cur_iter_values[i].value > self.iterators[cur_iter_values[i].name].end_value:
+                cur_iter_values[i].value = 0
+                if i != 0:
+                    cur_iter_values[i - 1].value += 1
+                else:
+                    break
+
 
 class ProgramRecomHandler:
     def __init__(self, luna_build_dir):
@@ -84,16 +94,6 @@ class ProgramRecomHandler:
         df = self._data.data_fragments[var_cf_arg.name]
         if var_cf_arg.ref not in df.refs:
             df.refs.append(var_cf_arg.ref)
-
-    def _inc_cur_iter_values(self, iterator_context, cur_iter_values):
-        cur_iter_values[-1].value += 1
-        for i in reversed(range(len(cur_iter_values))):
-            if cur_iter_values[i].value > iterator_context.iterators[cur_iter_values[i].name].end_value:
-                cur_iter_values[i].value = 0
-                if i != 0:
-                    cur_iter_values[i - 1].value += 1
-                else:
-                    break
 
     def _build_cf_ref(self, block, iterator_context):
         cf_ref = []
@@ -142,7 +142,8 @@ class ProgramRecomHandler:
 
     def _register_calc_fragment(self, block, iterator_context):
         cur_iter_values = iterator_context.get_cur_iter_values()
-        for i in range(iterator_context.get_cartesian_size()):
+        cartesian_size = iterator_context.get_cartesian_size()
+        for i in range(cartesian_size):
             # string = ''
             # for value in cur_iter_values:
             #     string += f'{value.value}, '
@@ -152,7 +153,9 @@ class ProgramRecomHandler:
             cf = CalculationFragment(block['id'][0], self._build_cf_ref(block, iterator_context), block['code'])
             cf.args = self._build_cf_args(block, iterator_context)
             self._data.calculation_fragments.append(cf)
-            self._inc_cur_iter_values(iterator_context, cur_iter_values)
+
+            if cartesian_size > 1:
+                iterator_context.inc_cur_iter_values(cur_iter_values)
 
     def _register_for_block(self, block, iterator_context):
 

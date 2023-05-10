@@ -21,7 +21,10 @@ void DFDescriptor::addNewRef(std::list<std::string> refName) {
 }
 
 DF *DFDescriptor::getDFRefValue(std::list<std::string> refName) {
-    return this->refs.find(refName)->second;
+    if (this->refs.find(refName) == this->refs.end()) {
+        this->refs[refName] = new DF();
+    }
+    return this->refs[refName];
 }
 
 void DFDescriptor::setDFRefValue(std::list<std::string> refName, DF *value) {
@@ -57,10 +60,15 @@ DFManager::~DFManager() {
 
 DF *DFManager::getDFByFullName(std::list<std::string> name) {
     auto dfd = this->dfDescriptors.find(name.front())->second;
+    DF* ptr;
     if (name.size() == 1) {
-        return dfd->getBaseValue();
+        ptr = dfd->getBaseValue();
     } else {
         name.erase(name.begin());
-        return dfd->getDFRefValue(name);
+        ptr = dfd->getDFRefValue(name);
     }
+    if (ptr == nullptr) {
+        ptr = new DF();
+    }
+    return ptr;
 }
