@@ -93,9 +93,8 @@ class MPIProgramBuilder:
             IteratorDescriptor(block['iterator'], int(block['startValue']), int(block['endValue'])))
         cur_iter_values = iterator_context.get_cur_iter_values()
         cartesian_size = iterator_context.get_cartesian_size()
-        for i in range(cartesian_size):
+        for i in range(int(block['startValue']), int(block['endValue']) + 1):
             for exec_block in block['body']:
-                iterator_context.update_cur_iter_values(cur_iter_values)
                 match exec_block['type']:
                     case 'run':
                         # Building cf name, replace iterator by their cur value, if can
@@ -144,8 +143,9 @@ class MPIProgramBuilder:
                         self._generate_send_df(df_name, from_value, to_value)
                     case 'for':
                         self._handle_for_loop(exec_block, iterator_context)
-                if cartesian_size > 1:
-                    iterator_context.inc_cur_iter_values(cur_iter_values)
+            if cartesian_size > 1:
+                iterator_context.inc_cur_iter_values(cur_iter_values)
+                iterator_context.update_cur_iter_values(cur_iter_values)
         iterator_context.remove_iterator(block['iterator'])
 
     def _handle_exec_context(self, body, iterator_context):
@@ -167,6 +167,7 @@ class MPIProgramBuilder:
                     self._generate_send_df(exec_block['data'], exec_block['from'], exec_block['to'])
                 case 'for':
                     self._handle_for_loop(exec_block, iterator_context)
+
 
     def _generate_main_func(self):
         # Include standard MPI program pattern
