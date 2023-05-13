@@ -60,7 +60,7 @@ class IteratorContext:
     def get_cur_iter_values(self):
         cur_values = []
         for iter in self.iterators:
-            cur_values.append(CurValueIteratorDescriptor(self.iterators[iter].name, self.iterators[iter].start_value))
+            cur_values.append(CurValueIteratorDescriptor(self.iterators[iter].name, self.iterators[iter].cur_value))
         return cur_values
 
     def update_cur_iter_values(self, cur_iter_values):
@@ -82,7 +82,6 @@ class IteratorContext:
                     cur_iter_values[i - 1].value += 1
                 else:
                     break
-
 
 class ProgramRecomHandler:
     def __init__(self, luna_build_dir):
@@ -145,7 +144,9 @@ class ProgramRecomHandler:
         return args
 
     def _register_calc_fragment(self, block, iterator_context):
-        cur_iter_values = iterator_context.get_cur_iter_values()
+        cur_iter_values = []
+        for iter in iterator_context.iterators:
+            cur_iter_values.append(CurValueIteratorDescriptor(iterator_context.iterators[iter].name, iterator_context.iterators[iter].start_value))
         cartesian_size = iterator_context.get_cartesian_size()
         for i in range(cartesian_size):
             # string = ''
