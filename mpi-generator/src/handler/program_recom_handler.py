@@ -53,6 +53,10 @@ class IteratorContext:
     def remove_iterator(self, it_name):
         del self.iterators[it_name]
 
+    def reset_cur_values(self):
+        for iter in self.iterators:
+            self.iterators[iter].cur_value = self.iterators[iter].start_value
+
     def get_cur_iter_values(self):
         cur_values = []
         for iter in self.iterators:
@@ -156,6 +160,7 @@ class ProgramRecomHandler:
 
             if cartesian_size > 1:
                 iterator_context.inc_cur_iter_values(cur_iter_values)
+        iterator_context.reset_cur_values()
 
     def _register_for_block(self, block, iterator_context):
 
