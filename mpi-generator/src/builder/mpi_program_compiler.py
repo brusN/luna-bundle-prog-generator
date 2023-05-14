@@ -1,7 +1,7 @@
 import logging
 import os
 
-from exception.custom_exceptions import OsCommandExecutionException
+from src.exception.custom_exceptions import OsCommandExecutionException
 
 
 class IProgramCompiler:
