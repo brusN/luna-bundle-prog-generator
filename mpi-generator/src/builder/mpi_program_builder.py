@@ -1,11 +1,10 @@
 import json
 import logging
 import os
-import time
 
-from src.exception.custom_exceptions import OsCommandExecutionException
-from src.handler.cpp_file_handler import CPPFileHandler
-from src.handler.program_recom_handler import IteratorContext, IteratorDescriptor, ProgramRecomHandler
+from exception.custom_exceptions import OsCommandExecutionException
+from handler.cpp_file_handler import CPPFileHandler
+from handler.program_recom_handler import IteratorContext, IteratorDescriptor, ProgramRecomHandler
 
 
 class MPIProgramBuilder:
