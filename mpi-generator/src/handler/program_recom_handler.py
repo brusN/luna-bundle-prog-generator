@@ -1,8 +1,8 @@
 import json
 import logging
 
-from src.exception.custom_exceptions import SyntaxErrorException
-from src.handler.luna_fragments import DataFragment, CalculationFragment, VarCFArgument, ConstCFArgument, CodeFragment, \
+from exception.custom_exceptions import SyntaxErrorException
+from handler.luna_fragments import DataFragment, CalculationFragment, VarCFArgument, ConstCFArgument, CodeFragment, \
     FunctionArgumentDescriptor
 
 

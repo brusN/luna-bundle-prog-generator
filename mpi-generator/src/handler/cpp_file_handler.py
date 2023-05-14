@@ -1,6 +1,3 @@
-import os
-
-
 class CPPFileHandler:
     def __init__(self, file_name):
         self._file = open(file_name, 'w+')
