@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 
 from src.exception.custom_exceptions import OsCommandExecutionException
 from src.handler.cpp_file_handler import CPPFileHandler
@@ -82,6 +83,11 @@ class MPIProgramBuilder:
         self._cpp_file_handler.include_define_df(df_name)
 
     def _generate_exec_cf(self, cf, rank):
+        # res = cf.name
+        # for i in cf.ref:
+        #     res += f' {i},'
+        # res += f' {cf.code}'
+        # print(res)
         self._cpp_file_handler.include_cf_execution(cf, self._luna_fragments.code_fragments[cf.code], rank)
 
     def _generate_send_df(self, df_name, from_rank, to_rank):
@@ -148,6 +154,11 @@ class MPIProgramBuilder:
         iterator_context.remove_iterator(block['iterator'])
 
     def _handle_exec_context(self, body, iterator_context):
+        # for cf in self._luna_fragments.calculation_fragments:
+        #     res = cf.name
+        #     for cf_part in cf.ref:
+        #         res += f' {cf_part}'
+        #     print(res)
         for exec_block in body:
             match exec_block['type']:
                 case 'df':

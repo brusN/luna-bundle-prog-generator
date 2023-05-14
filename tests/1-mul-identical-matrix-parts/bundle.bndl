@@ -1,0 +1,18 @@
+define {
+    CPU_CORES = 6;
+    N = 49;
+}
+
+execution {
+    define df matrixA;
+    define df matrixB;
+    define df resultMatrix;
+
+    for i=1..$CPU_CORES {
+       for j=0..$N {
+            run initMatrixA[i][j] on rank i;
+            run initMatrixB[i][j] on rank i;
+            run mulMatrixs[i][j] on rank i;
+       }
+    }
+}

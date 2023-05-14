@@ -77,7 +77,7 @@ class IteratorContext:
         cur_iter_values[-1].value += 1
         for i in reversed(range(len(cur_iter_values))):
             if cur_iter_values[i].value > self.iterators[cur_iter_values[i].name].end_value:
-                cur_iter_values[i].value = 0
+                cur_iter_values[i].value = self.iterators[cur_iter_values[i].name].start_value
                 if i != 0:
                     cur_iter_values[i - 1].value += 1
                 else:
@@ -149,12 +149,7 @@ class ProgramRecomHandler:
             cur_iter_values.append(CurValueIteratorDescriptor(iterator_context.iterators[iter].name, iterator_context.iterators[iter].start_value))
         cartesian_size = iterator_context.get_cartesian_size()
         for i in range(cartesian_size):
-            # string = ''
-            # for value in cur_iter_values:
-            #     string += f'{value.value}, '
-            # print(string) <--- for debug
             iterator_context.update_cur_iter_values(cur_iter_values)
-
             cf = CalculationFragment(block['id'][0], self._build_cf_ref(block, iterator_context), block['code'])
             cf.args = self._build_cf_args(block, iterator_context)
             self._data.calculation_fragments.append(cf)
