@@ -1,0 +1,28 @@
+import c_init_vector(name, int, int) as init_vector;
+import c_init_df(name, int) as init_df;
+import c_get_vector_part(value, int, int, name) as get_vector_part;
+import c_print_info(value) as print_info;
+import c_calc_scalar_mul(value, value, name) as calc_scalar_mul;
+import c_collect_result(value, value, name) as collect_result;
+import c_print_result(value) as print_result;
+
+
+sub main() {
+    df vectorA, vectorAPart, vectorB, vectorBPart, result, resultPart;
+    
+    cf initVectorA: init_vector(vectorA, 100, 1);
+    cf initVectorB: init_vector(vectorB, 100, 2);
+
+    for i=1..5 {
+        cf getVectorAPart[i]: get_vector_part(vectorA, i, 5, vectorAPart[i]);
+        cf getVectorBPart[i]: get_vector_part(vectorB, i, 5, vectorBPart[i]);
+        cf scalar_mul_vector_parts[i]: calc_scalar_mul(vectorAPart[i], vectorBPart[i], resultPart[i]);
+    }
+
+    cf initResult: init_df(result[1], 0);
+    for i=1..5 {
+        cf collect_result_parts[i]: collect_result(resultPart[i], result[i], result[i+1]);
+    }
+
+    cf printResult: print_result(result[6]);
+}
