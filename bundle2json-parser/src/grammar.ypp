@@ -1,12 +1,13 @@
 %{
 #include <iostream>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include "parserlib.h"
 
 #define YYSTYPE std::string
 
-int yylex(void);
+int yylex();
 int yyerror(char* msg);
 
 BundleContainer container;
@@ -17,11 +18,13 @@ BundleContainer container;
 
 %token VARIABLE NUMBER
 
-%token LCB RCB LSB RSB
+%token LCB RCB LSB RSB LP RP
 
 %token EQUAL SEMICOLON BUCK
 
 %token KW_FOR KW_DOUBLE_DOT
+
+%token PLUS MINUS MUL DIV
 
 %%
 input: KW_DEFINE LCB define_context RCB KW_EXECUTION LCB execution_context RCB {
@@ -60,31 +63,31 @@ execution_subblock:
      | for_block       { $$ = $1; }
 ;
 
-for_block: KW_FOR VARIABLE EQUAL var_or_value_or_macro KW_DOUBLE_DOT var_or_value_or_macro LCB execution_context RCB {
+for_block: KW_FOR VARIABLE EQUAL int_expr KW_DOUBLE_DOT int_expr LCB execution_context RCB {
      ForSubblock* block = new ForSubblock();
      ExecutionContext* context = container.getContextByUUID($8);
      block->setIteratorName($2);
-     block->setStartIndex($4);
-     block->setEndIndex($6);
+     block->setStartIndex(container.getExpressionByUUID($4));
+     block->setEndIndex(container.getExpressionByUUID($6));
      block->setBody(context);
      std::string uuid = container.registerNewBlock(block);
      $$ = uuid;
 };
 
-send_block: KW_SEND df_name KW_FROM var_or_value_or_macro KW_TO var_or_value_or_macro SEMICOLON {
+send_block: KW_SEND df_name KW_FROM int_expr KW_TO int_expr SEMICOLON {
      SendSubblock * block = new SendSubblock();
      block->setDFD(container.getDFDByUUID($2));
-     block->setFromRank($4);
-     block->setToRank($6);
+     block->setFromRank(container.getExpressionByUUID($4));
+     block->setToRank(container.getExpressionByUUID($6));
      std::string uuid = container.registerNewBlock(block);
      $$ = uuid;
 };
 
-run_block: KW_RUN task_name KW_ON KW_RANK var_or_value_or_macro SEMICOLON {
+run_block: KW_RUN task_name KW_ON KW_RANK int_expr SEMICOLON {
      RunSubblock * block = new RunSubblock();
      TaskDescriptor* taskDescriptor = container.getTaskByUUID($2);
-     block->setCfName(taskDescriptor->getName());
-     block->setRank($5);
+     block->setCf(taskDescriptor);
+     block->setRank(container.getExpressionByUUID($5));
      std::string uuid = container.registerNewBlock(block);
      $$ = uuid;
 };
@@ -98,23 +101,23 @@ define_df_block: KW_DEFINE KW_DF VARIABLE SEMICOLON {
 
 task_name: VARIABLE {
      TaskDescriptor* task = new TaskDescriptor();
-     task->addNamePart($1);
+     task->setBaseName($1);
      std::string uuid = container.registerNewTask(task);
      $$ = uuid; 
-} | task_name LSB var_or_value_or_macro RSB {
+} | task_name LSB int_expr RSB {
      TaskDescriptor* task = container.getTaskByUUID($1);
-     task->addNamePart($3);
+     task->addRef(container.getExpressionByUUID($3));
      $$ = $1;
 };
 
 df_name: VARIABLE {
      DFDescriptor* dfd = new DFDescriptor();
-     dfd->addNamePart($1);
+     dfd->setBaseName($1);
      std::string uuid = container.registerNewDFD(dfd);
      $$ = uuid;
-} | df_name LSB var_or_value_or_macro RSB {
+} | df_name LSB int_expr RSB {
      DFDescriptor* dfd = container.getDFDByUUID($1);
-     dfd->addNamePart($3);
+     dfd->addRef(container.getExpressionByUUID($3));
      $$ = $1;
 };
 
@@ -123,10 +126,56 @@ macro_var: BUCK VARIABLE {
      $$ = value;   
 };
 
-var_or_value_or_macro: 
-     VARIABLE { $$ = $1; } 
-     | NUMBER { $$ = $1; }
-     | macro_var { $$ = $1; }
+int_expr:
+    term {
+        $$ = $1;
+    } | int_expr PLUS term {
+        IIntExpression* leftOperand = container.getExpressionByUUID($1);
+        IIntExpression* rightOperand = container.getExpressionByUUID($3);
+        OperationIntExpression* expr = new OperationIntExpression($2, leftOperand, rightOperand);
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    } | int_expr MINUS term {
+        IIntExpression* leftOperand = container.getExpressionByUUID($1);
+        IIntExpression* rightOperand = container.getExpressionByUUID($3);
+        OperationIntExpression* expr = new OperationIntExpression($2, leftOperand, rightOperand);
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    }
+;
+
+term:
+    factor {
+        $$ = $1;
+    } | term MUL factor {
+        IIntExpression* leftOperand = container.getExpressionByUUID($1);
+        IIntExpression* rightOperand = container.getExpressionByUUID($3);
+        OperationIntExpression* expr = new OperationIntExpression($2, leftOperand, rightOperand);
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    } | term DIV factor {
+        IIntExpression* leftOperand = container.getExpressionByUUID($1);
+        IIntExpression* rightOperand = container.getExpressionByUUID($3);
+        OperationIntExpression* expr = new OperationIntExpression($2, leftOperand, rightOperand);
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    }
+;
+
+factor:
+    NUMBER {
+        ConstIntExpression* expr = new ConstIntExpression(std::stoi($1));
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    } | macro_var {
+        ConstIntExpression* expr = new ConstIntExpression(std::stoi($1));
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    } | VARIABLE {
+        VarIntExpression* expr = new VarIntExpression($1);
+        std::string uuid = container.registerNewExpression(expr);
+        $$ = uuid;
+    }
 ;
 
 %%

@@ -4,58 +4,48 @@
     ------------- RunSubblock impl -------------
 */
 
-std::string& RunSubblock::getRank() {
+IIntExpression* RunSubblock::getRank() {
     return rank;
 }
 
-void RunSubblock::setRank(std::string rank) {
+void RunSubblock::setRank(IIntExpression* rank) {
     this->rank = rank;
 }
 
-std::list<std::string>& RunSubblock::getCfName() {
-    return cfName;
+TaskDescriptor* RunSubblock::getCf() {
+    return cf;
 }
 
-void RunSubblock::setCfName(std::list<std::string> task) {
-    this->cfName = task;
-}
-
-std::string RunSubblock::buildNameForJSON() {
-    auto cfNameIterator = cfName.begin();
-    std::string taskName = "[\"" + *cfNameIterator + "\"";
-    for (++cfNameIterator; cfNameIterator != cfName.end(); ++cfNameIterator) {
-        taskName += ", \"" + *cfNameIterator + "\"";
-    }
-    taskName += "]";
-    return taskName;
+void RunSubblock::setCf(TaskDescriptor* cf) {
+    this->cf = cf;
 }
 
 std::string RunSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"run\"," + 
-                                            "\"rank\": " + "\"" + rank + "\"" + "," + 
-                                            "\"cf\": " + buildNameForJSON() +
+                                            "\"rank\": " + rank->toJSONStruct() + "," +
+                                            "\"cf\": " + cf->toJSONStruct() +
                                         "}";
     return buildString;
 }
 
 /*
     ------------- SendSubblock impl -------------
-*/ 
+*/
 
-std::string& SendSubblock::getFromRank() {
+IIntExpression* SendSubblock::getFromRank() {
     return fromRank;
 }
 
-void SendSubblock::setFromRank(std::string fromRank) {
+void SendSubblock::setFromRank(IIntExpression*fromRank) {
     this->fromRank = fromRank;
 }
 
-std::string& SendSubblock::getToRank() {
+IIntExpression* SendSubblock::getToRank() {
     return toRank;
 }
 
-void SendSubblock::setToRank(std::string toRank) {
+void SendSubblock::setToRank(IIntExpression* toRank) {
     this->toRank = toRank;
 }
 
@@ -68,12 +58,12 @@ void SendSubblock::setDFD(DFDescriptor* dfd) {
 }
 
 std::string SendSubblock::toJSONStruct() {
-    std::string buildString = std::string("{") + 
-                                            "\"type\": \"send\"," + 
-                                            "\"data\": " + dfd->to_cf_json_name() + "," +
-                                            "\"from\": " + "\"" + fromRank + "\"" + "," +
-                                            "\"to\": " + "\"" + toRank + "\"" + 
-                                            "}";
+    std::string buildString = std::string("{") +
+                                "\"type\": \"send\"," +
+                                "\"data\": " + dfd->toJSONStruct() + "," +
+                                "\"from\": " + fromRank->toJSONStruct() + "," +
+                                "\"to\": " + toRank->toJSONStruct() +
+                              "}";
     return buildString;
 }
 
@@ -90,7 +80,10 @@ void DefineDataFragmentSubblock::setName(std::string name) {
 }
 
 std::string DefineDataFragmentSubblock::toJSONStruct() {
-    std::string buildString = std::string("{\"type\": \"df\", \"name\": \"" + name + "\"}");
+    std::string buildString = std::string("{"
+                                            "\"type\": \"df\", "
+                                            "\"name\": \"" + name + "\""
+                                          "}");
     return buildString;
 }
 
@@ -114,19 +107,19 @@ std::string& ForSubblock::getIteratorName() {
     return iteratorName;
 }
 
-void ForSubblock::setStartIndex(std::string startIndex) {
+void ForSubblock::setStartIndex(IIntExpression* startIndex) {
     this->startIndex = startIndex;
 }
 
-std::string ForSubblock::getStartIndex() {
+IIntExpression* ForSubblock::getStartIndex() {
     return startIndex;
 }
 
-void ForSubblock::setEndIndex(std::string endIndex) {
+void ForSubblock::setEndIndex(IIntExpression* endIndex) {
     this->endIndex = endIndex;
 }
 
-std::string ForSubblock::getEndIndex() {
+IIntExpression* ForSubblock::getEndIndex() {
     return endIndex;
 }
 
@@ -134,8 +127,8 @@ std::string ForSubblock::toJSONStruct() {
     std::string buildString = std::string("{") + 
                                             "\"type\": \"for\"," + 
                                             "\"iterator\": \"" + iteratorName + "\"," + 
-                                            "\"startValue\": \"" + startIndex + "\"," +
-                                            "\"endValue\": \"" + endIndex + "\"," +
+                                            "\"startValue\": " + startIndex->toJSONStruct() + "," +
+                                            "\"endValue\": " + endIndex->toJSONStruct() + "," +
                                             "\"body\": " + body->toJSONStruct() + 
                                             "}";
     return buildString;
@@ -168,40 +161,70 @@ std::string ExecutionContext::toJSONStruct() {
     ------------- TaskDescriptor impl -------------
 */
 
-std::list<std::string>& TaskDescriptor::getName() {
-    return name;
+std::string& TaskDescriptor::getBaseName() {
+    return baseName;
 }
 
-void TaskDescriptor::setName(std::list<std::string> name) {
-    this->name = name;
+void TaskDescriptor::setBaseName(std::string name) {
+    this->baseName = name;
 }
 
-void TaskDescriptor::addNamePart(std::string namePart) {
-    name.emplace_back(namePart);
+std::list<IIntExpression*>& TaskDescriptor::getRefs() {
+    return refs;
+}
+
+void TaskDescriptor::addRef(IIntExpression *ref) {
+    refs.emplace_back(ref);
+}
+
+std::string TaskDescriptor::toJSONStruct() {
+    std::string cfName = "[\"" + baseName + "\"";
+
+    if (refs.size() == 0) {
+        cfName += "]";
+        return cfName;
+    }
+
+    for (auto ref: refs) {
+        cfName += ", " + ref->toJSONStruct();
+    }
+
+    cfName += "]";
+    return cfName;
 }
 
 /*
     ------------- DFDescriptor impl -------------
 */
 
-std::list<std::string>& DFDescriptor::getName() {
-    return name;
+std::string& DFDescriptor::getBaseName() {
+    return baseName;
 }
 
-void DFDescriptor::setName(std::list<std::string> name) {
-    this->name = name;
+void DFDescriptor::setBaseName(std::string name) {
+    this->baseName = name;
 }
 
-void DFDescriptor::addNamePart(std::string namePart) {
-    name.emplace_back(namePart);
+std::list<IIntExpression*>& DFDescriptor::getRefs() {
+    return refs;
 }
 
-std::string DFDescriptor::to_cf_json_name() {
-    auto dfNameIterator = name.begin();
-    std::string dfName = "[\"" + *dfNameIterator + "\"";
-    for (++dfNameIterator; dfNameIterator != name.end(); ++dfNameIterator) {
-        dfName += ", \"" + *dfNameIterator + "\"";
+void DFDescriptor::addRef(IIntExpression *ref) {
+    refs.emplace_back(ref);
+}
+
+std::string DFDescriptor::toJSONStruct() {
+    std::string dfName = "[\"" + baseName + "\"";
+
+    if (refs.size() == 0) {
+        dfName += "]";
+        return dfName;
     }
+
+    for (auto ref: refs) {
+        dfName += ", " + ref->toJSONStruct();
+    }
+
     dfName += "]";
     return dfName;
 }
@@ -272,6 +295,16 @@ ExecutionContext* BundleContainer::getMainContext() {
     return mainContext;
 }
 
+std::string BundleContainer::registerNewExpression(IIntExpression *expression) {
+    std::string exprUUID = UUIDGenerator::generateUUID();
+    expressions[exprUUID] = expression;
+    return exprUUID;
+}
+
+IIntExpression* BundleContainer::getExpressionByUUID(std::string uuid) {
+    return expressions[uuid];
+}
+
 BundleContainer::~BundleContainer() {
     // Execute blocks clear
     for (auto it = blocks.begin(); it != blocks.end(); ++it) {
@@ -291,4 +324,99 @@ BundleContainer::~BundleContainer() {
     for (auto it = dfs.begin(); it != dfs.end(); ++it) {
         delete it->second;
     }
+}
+
+ConstIntExpression::ConstIntExpression(int value) {
+    this->value = value;
+}
+
+void ConstIntExpression::setValue(int value) {
+    this->value = value;
+}
+
+int ConstIntExpression::getValue() {
+    return value;
+}
+
+std::string ConstIntExpression::toJSONStruct() {
+    std::string buildString = std::string("{") +
+                              "\"type\": \"iconst\"," +
+                              "\"value\": " + std::to_string(value) +
+                              "}";
+    return buildString;
+}
+
+ConstIntExpression::~ConstIntExpression() {
+    // pass
+}
+
+VarIntExpression::VarIntExpression(std::string name) {
+    this->name = name;
+}
+
+void VarIntExpression::setName(std::string name) {
+    this->name = name;
+}
+
+std::string VarIntExpression::getName() {
+    return name;
+}
+
+std::string VarIntExpression::toJSONStruct() {
+    std::string buildString = std::string("{") +
+                              "\"type\": \"var\"," +
+                              "\"name\": \"" + name + "\""
+                              "}";
+    return buildString;
+}
+
+VarIntExpression::~VarIntExpression() {
+    // pass
+}
+
+OperationIntExpression::OperationIntExpression(std::string op, IIntExpression *leftOperand, IIntExpression *rightOperand) {
+    this->op = op;
+    this->leftOperand = leftOperand;
+    this->rightOperand = rightOperand;
+}
+
+void OperationIntExpression::setOperation(std::string op) {
+    this->op = op;
+}
+
+std::string OperationIntExpression::getOperation() {
+    return op;
+}
+
+void OperationIntExpression::setLeftOperand(IIntExpression *operand) {
+    this->leftOperand = operand;
+}
+
+IIntExpression *OperationIntExpression::getLeftOperand() {
+    return leftOperand;
+}
+
+void OperationIntExpression::setRightOperand(IIntExpression *operand) {
+    this->rightOperand = operand;
+}
+
+IIntExpression *OperationIntExpression::getRightOperand() {
+    return rightOperand;
+}
+
+std::string OperationIntExpression::toJSONStruct() {
+    std::string buildString = std::string("{") +
+                              "\"type\": \"" + op + "\"," +
+                              "\"operands\": [" + leftOperand->toJSONStruct() + "," + rightOperand->toJSONStruct() + "]" +
+                              "}";
+    return buildString;
+}
+
+OperationIntExpression::~OperationIntExpression() {
+    delete leftOperand;
+    delete rightOperand;
+}
+
+IIntExpression::~IIntExpression() {
+
 }

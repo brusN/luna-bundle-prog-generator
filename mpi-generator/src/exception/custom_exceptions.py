@@ -4,3 +4,6 @@ class OsCommandExecutionException(Exception):
 
 class SyntaxErrorException(Exception):
     pass
+
+class ExpressionParseException(Exception):
+    pass
