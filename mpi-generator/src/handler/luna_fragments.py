@@ -36,7 +36,7 @@ class DataFragment(ILunaFragment):
 
 # ------ Cf's args descriptor classes ------
 
-class FunctionArgumentDescriptor:
+class FunctionParameterDescriptor:
     type: str
     name: str
 

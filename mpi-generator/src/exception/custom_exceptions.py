@@ -5,5 +5,14 @@ class OsCommandExecutionException(Exception):
 class SyntaxErrorException(Exception):
     pass
 
+
 class ExpressionParseException(Exception):
+    pass
+
+
+class NoIteratorInContextException(Exception):
+    pass
+
+
+class UnknownBundleExpressionTypeException(Exception):
     pass
