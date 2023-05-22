@@ -16,20 +16,20 @@ class LunaExpressionParser:
 
     @classmethod
     def get_unwrapped_value(cls, expr, iterator_context):
-        match expr.type:
+        match expr['type']:
             case 'iconst':
-                return expr.value
+                return expr['value']
             case 'rconst':
-                return expr.value
+                return expr['value']
             case 'sconst':
-                return expr.value
+                return expr['value']
             case 'id':
-                it_name = expr.ref[0]
+                it_name = expr['ref'][0]
                 return iterator_context.get_iterator_cur_value(it_name)
             case _:
-                left_operand_expr = expr.operands[0]
-                right_operand_expr = expr.operands[1]
-                op = expr.type
+                left_operand_expr = expr['operands'][0]
+                right_operand_expr = expr['operands'][1]
+                op = expr['type']
                 return cls._unwrap_math_operation(left_operand_expr, right_operand_expr, op, iterator_context)
 
 

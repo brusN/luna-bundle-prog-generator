@@ -116,12 +116,9 @@ class MPIProgramBuilder:
         iterator_context.remove_iterator(block['iterator'])
 
     def _find_cf(self, cf_name):
-        cf_full_name = [cf_name[0]]
-        for cf_name_part in cf_full_name[1:]:
-            cf_full_name.append(int(cf_name_part))
         filtered_list = []
         for it in self._luna_fragments.calculation_fragments:
-            if it.name == cf_full_name[0] and it.ref == cf_full_name[1:]:
+            if it.name == cf_name[0] and it.ref == cf_name[1:]:
                 filtered_list.append(it)
         if len(filtered_list) == 0:
             raise CfNotFoundException(f'No found descriptor for cf {cf_name[0]}')
