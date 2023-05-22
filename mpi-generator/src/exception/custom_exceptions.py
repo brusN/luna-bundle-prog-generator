@@ -14,5 +14,9 @@ class NoIteratorInContextException(Exception):
     pass
 
 
+class UsingNoDefinedDataFragmentException(Exception):
+    pass
+
+
 class UnknownBundleExpressionTypeException(Exception):
     pass

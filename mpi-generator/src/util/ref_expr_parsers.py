@@ -19,6 +19,10 @@ class LunaExpressionParser:
         match expr.type:
             case 'iconst':
                 return expr.value
+            case 'rconst':
+                return expr.value
+            case 'sconst':
+                return expr.value
             case 'id':
                 it_name = expr.ref[0]
                 return iterator_context.get_iterator_cur_value(it_name)
