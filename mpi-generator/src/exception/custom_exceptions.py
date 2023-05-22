@@ -20,3 +20,11 @@ class UsingNoDefinedDataFragmentException(Exception):
 
 class UnknownBundleExpressionTypeException(Exception):
     pass
+
+
+class CfNotFoundException(Exception):
+    pass
+
+
+class MultiplyCfDescriptorsException(Exception):
+    pass

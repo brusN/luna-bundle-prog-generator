@@ -1,4 +1,4 @@
-from src.exception.custom_exceptions import UnknownBundleExpressionTypeException
+from exception.custom_exceptions import UnknownBundleExpressionTypeException
 
 
 class LunaExpressionParser:
