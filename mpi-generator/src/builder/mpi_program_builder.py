@@ -136,9 +136,12 @@ class MPIProgramBuilder:
                     self._generate_define_df(exec_block['name'])
                 case 'run':
                     cf = self._find_cf(exec_block['cf'])
-                    self._generate_exec_cf(cf, exec_block['rank'])
+                    rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['rank'], iterator_context)
+                    self._generate_exec_cf(cf, rank)
                 case 'send':
-                    self._generate_send_df(exec_block['data'], exec_block['from'], exec_block['to'])
+                    from_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['from'], iterator_context)
+                    to_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['to'], iterator_context)
+                    self._generate_send_df(exec_block['data'], from_rank, to_rank)
                 case 'for':
                     self._handle_for_loop(exec_block, iterator_context)
 
