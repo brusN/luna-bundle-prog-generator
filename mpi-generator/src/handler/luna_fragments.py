@@ -6,6 +6,7 @@ class ILunaFragment:
 
 
 class CodeFragment(ILunaFragment):
+
     def __init__(self, name, code, args):
         self.name = name
         self.code = code

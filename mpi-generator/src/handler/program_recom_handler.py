@@ -1,9 +1,9 @@
 import json
 import logging
 
-from handler.luna_fragments import DataFragment, CalculationFragment, VarCFArgument, ConstCFArgument, CodeFragment, FunctionArgumentDescriptor
 from exception.custom_exceptions import NoIteratorInContextException
-from util.luna_fragments_parsers import CodeFragmentHandler, CalculationFragmentHandler
+from handler.luna_fragments import DataFragment, CalculationFragment
+from util.luna_fragments_parsers import CalculationFragmentHandler, CodeFragmentHandler
 from util.ref_expr_parsers import LunaExpressionParser
 
 
@@ -27,21 +27,6 @@ class LunaFragments:
 
     def check_if_df_exists(self, df_name):
         return df_name in self.data_fragments
-
-
-# Converter LuNA types to C++ types
-class ArgTypeMapper:
-    types_map = {
-        'int': 'int',
-        'real': 'double',
-        'string': 'string',
-        'name': 'DF &',
-        'value': 'const DF &'
-    }
-
-    @classmethod
-    def get_mapped_type(cls, arg_type):
-        return cls.types_map[arg_type]
 
 
 class ValueIteratorDescriptor:
@@ -137,7 +122,8 @@ class ProgramRecomHandler:
             cf_args = CalculationFragmentHandler.build_cf_args(cf_json_block, iterator_context, self._data)
             cf = CalculationFragment(cf_name, cf_ref, cf_json_block['code'], cf_args)
             self._data.calculation_fragments.append(cf)
-            iterator_context.inc_cur_iter_values(iter_values)
+            if cartesian_size > 1:
+                iterator_context.inc_cur_iter_values(iter_values)
         iterator_context.reset_cur_values()
 
     def _parse_for_block(self, block, iterator_context):

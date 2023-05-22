@@ -31,13 +31,18 @@ class CPPFileHandler:
     def include_cf_execution(self, calculation_fragment, code_fragment, rank):
         args = ''
         for arg in calculation_fragment.args:
-            if arg.type == 'const':
-                args += str(arg.value) + ', '
-            elif arg.type == 'var':
-                cpp_list_define = f'"{arg.name}"'
-                for cf_ref_part in arg.ref:
-                    cpp_list_define += f', "{cf_ref_part}"'
-                args += f'*dfManager.getDFByFullName({{ {cpp_list_define} }}), '
+            match arg.type:
+                case 'iconst':
+                    args += str(arg.value) + ', '
+                case 'rconst':
+                    args += str(arg.value) + ', '
+                case 'sconst':
+                    args += f'\"{arg.value}\", '
+                case 'var':
+                    cpp_list_define = f'"{arg.name}"'
+                    for cf_ref_part in arg.ref:
+                        cpp_list_define += f', "{cf_ref_part}"'
+                    args += f'*dfManager.getDFByFullName({{ {cpp_list_define} }}), '
         args = args[:-2]
         self.write_line(f'if (rank == {rank}) {{ \
             {code_fragment.code}({args}); \
