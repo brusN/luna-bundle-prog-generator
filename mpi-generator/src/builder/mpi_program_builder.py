@@ -79,8 +79,8 @@ class MPIProgramBuilder:
         for code_fragment in self._luna_fragments.code_fragments:
             self._cpp_file_handler.include_extern_void_func(self._luna_fragments.code_fragments[code_fragment])
 
-    def _generate_define_df(self, df_name):
-        self._cpp_file_handler.include_define_df(df_name)
+    def _generate_define_df(self, df):
+        self._cpp_file_handler.include_define_df(df)
 
     def _generate_exec_cf(self, cf, rank):
         self._cpp_file_handler.include_cf_execution(cf, self._luna_fragments.code_fragments[cf.code], rank)
@@ -100,7 +100,7 @@ class MPIProgramBuilder:
                 match exec_block['type']:
                     case 'run':
                         built_cf_name = BundleControlUnitParser.build_full_cf_name(exec_block['cf'], iterator_context)
-                        cf = self._find_cf(built_cf_name)
+                        cf = self._luna_fragments.get_cf(built_cf_name)
                         rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['rank'], iterator_context)
                         self._generate_exec_cf(cf, rank)
                     case 'send':
@@ -115,24 +115,15 @@ class MPIProgramBuilder:
                 iterator_context.update_cur_iter_values(cur_iter_values)
         iterator_context.remove_iterator(block['iterator'])
 
-    def _find_cf(self, cf_name):
-        filtered_list = []
-        for it in self._luna_fragments.calculation_fragments:
-            if it.name == cf_name[0] and it.ref == cf_name[1:]:
-                filtered_list.append(it)
-        if len(filtered_list) == 0:
-            raise CfNotFoundException(f'No found descriptor for cf {cf_name[0]}')
-        if len(filtered_list) > 1:
-            raise MultiplyCfDescriptorsException(f'Cf {cf_name} or his ref has multiply descriptors')
-        return filtered_list[0]
-
     def _handle_exec_context(self, body, iterator_context):
         for exec_block in body:
             match exec_block['type']:
                 case 'df':
-                    self._generate_define_df(exec_block['name'])
+                    df = self._luna_fragments.get_df(exec_block['name'])
+                    self._generate_define_df(df)
                 case 'run':
-                    cf = self._find_cf(exec_block['cf'])
+                    built_cf_name = BundleControlUnitParser.build_full_cf_name(exec_block['cf'], iterator_context)
+                    cf = self._luna_fragments.get_cf(built_cf_name)
                     rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['rank'], iterator_context)
                     self._generate_exec_cf(cf, rank)
                 case 'send':
@@ -150,6 +141,7 @@ class MPIProgramBuilder:
                 MPI_Init(&argc, &argv); \
                 MPI_Comm_rank(MPI_COMM_WORLD, &rank); \
                 MPI_Comm_size(MPI_COMM_WORLD, &size); \
+                printf(\"%d, %d\\n\", rank, size); \
                 DFManager dfManager; \
             ')
 

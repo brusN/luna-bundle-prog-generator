@@ -5,6 +5,7 @@ from exception.custom_exceptions import NoIteratorInContextException
 from handler.luna_fragments import DataFragment, CalculationFragment
 from util.luna_fragments_parsers import CalculationFragmentHandler, CodeFragmentHandler
 from util.ref_expr_parsers import LunaExpressionParser
+from exception.custom_exceptions import CfNotFoundException, MultiplyCfDescriptorsException, DfNotFoundException
 
 
 # Stores parsed fragments from program_recom.ja file
@@ -27,6 +28,22 @@ class LunaFragments:
 
     def check_if_df_exists(self, df_name):
         return df_name in self.data_fragments
+
+    def get_cf(self, cf_name):
+        filtered_list = []
+        for it in self.calculation_fragments:
+            if it.name == cf_name[0] and it.ref == cf_name[1:]:
+                filtered_list.append(it)
+        if len(filtered_list) == 0:
+            raise CfNotFoundException(f'No found descriptor for cf {cf_name[0]}')
+        if len(filtered_list) > 1:
+            raise MultiplyCfDescriptorsException(f'Cf {cf_name} or his ref has multiply descriptors')
+        return filtered_list[0]
+
+    def get_df(self, df_name):
+        if df_name not in self.data_fragments:
+            raise DfNotFoundException(f'No df with name {df_name}')
+        return self.data_fragments[df_name]
 
 
 class ValueIteratorDescriptor:

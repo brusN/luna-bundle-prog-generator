@@ -35,7 +35,9 @@ private:
 public:
     void addNewDF(DFDescriptor* dfDescriptor);
     DFDescriptor* getDFDescriptor(std::string dfName);
+    void addRefToDF(std::string dfName, std::list<std::string> ref);
     DF* getDFByFullName(std::list<std::string> name);
+    void sendDfBetweenNodes(std::list<std::string> dfName, int senderRank, int receiverRank);
     ~DFManager();
 };
 

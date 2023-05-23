@@ -48,8 +48,6 @@ class DataFragmentHandler:
             df_ref.append(LunaExpressionParser.get_unwrapped_value(cf_ref_part_expr, iterator_context))
         return df_ref
 
-
-
 class CalculationFragmentHandler:
     @classmethod
     def build_cf_ref(cls, cf_json_block, iterator_context):
@@ -79,9 +77,10 @@ class CalculationFragmentHandler:
                         df_ref = DataFragmentHandler.build_df_ref(arg, iterator_context)
                         args.append(VarCFArgument(df_name, df_ref))
 
-                        # Check if df exists and add new ref, if it isn't added yet
-                        if luna_fragments.check_if_df_exists(df_name):
-                            luna_fragments.register_new_df_ref(df_name, df_ref)
-                        else:
-                            raise UsingNoDefinedDataFragmentException(f'DF {df_name} not registered')
+                        if len(df_ref) > 0:
+                            # Check if df exists and add new ref, if it isn't added yet
+                            if luna_fragments.check_if_df_exists(df_name):
+                                luna_fragments.register_new_df_ref(df_name, df_ref)
+                            else:
+                                raise UsingNoDefinedDataFragmentException(f'DF {df_name} not registered')
         return args

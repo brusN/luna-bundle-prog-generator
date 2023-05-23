@@ -58,6 +58,11 @@ DFManager::~DFManager() {
     }
 }
 
+void DFManager::addRefToDF(std::string dfName, std::list<std::string> ref) {
+    DFDescriptor* dfDescriptor = getDFDescriptor(dfName);
+    dfDescriptor->addNewRef(ref);
+}
+
 DF *DFManager::getDFByFullName(std::list<std::string> name) {
     auto dfd = this->dfDescriptors.find(name.front())->second;
     DF* ptr;
@@ -71,4 +76,8 @@ DF *DFManager::getDFByFullName(std::list<std::string> name) {
         ptr = new DF();
     }
     return ptr;
+}
+
+void DFManager::sendDfBetweenNodes(std::list<std::string> dfName, int senderRank, int receiverRank) {
+
 }

@@ -28,3 +28,7 @@ class CfNotFoundException(Exception):
 
 class MultiplyCfDescriptorsException(Exception):
     pass
+
+
+class DfNotFoundException(Exception):
+    pass
