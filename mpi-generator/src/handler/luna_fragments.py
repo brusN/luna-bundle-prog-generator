@@ -6,29 +6,28 @@ class ILunaFragment:
 
 
 class CodeFragment(ILunaFragment):
-    name: str
-    code: str
-    args: list
 
-    def __init__(self):
-        self.args = []
+    def __init__(self, name, code, args):
+        self.name = name
+        self.code = code
+        self.args = args
 
     def to_cpp_src(self):
         return f'void {self.code}();'
 
 
 class CalculationFragment(ILunaFragment):
-    def __init__(self, name, ref, code):
+    def __init__(self, name, ref, code, args):
         self.name = name
         self.ref = ref
         self.code = code
-        self.args = []
+        self.args = args
 
 
 class DataFragment(ILunaFragment):
     def __init__(self, name, ref):
         self.name = name
-        self.refs = []
+        self.refs = ref
 
     def to_cpp_src(self):
         return f'DF {self.name};'
@@ -36,9 +35,13 @@ class DataFragment(ILunaFragment):
 
 # ------ Cf's args descriptor classes ------
 
-class FunctionArgumentDescriptor:
+class FunctionParameterDescriptor:
     type: str
     name: str
+
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
 
     def to_str(self):
         return f'{self.type} {self.name}'
@@ -49,19 +52,37 @@ class CalculationFragmentArgument:
         pass
 
 
-class ConstCFArgument(CalculationFragmentArgument):
+class IConstCFArgument(CalculationFragmentArgument):
 
     def __init__(self, value):
         self.value = value
-        self.type = 'const'
+        self.type = 'iconst'
+
+    def to_str(self):
+        return str(self.value)
+
+
+class RConstCFArgument(CalculationFragmentArgument):
+
+    def __init__(self, value):
+        self.value = value
+        self.type = 'rconst'
+
+    def to_str(self):
+        return str(self.value)
+
+
+class SConstCFArgument(CalculationFragmentArgument):
+
+    def __init__(self, value):
+        self.value = value
+        self.type = 'sconst'
 
     def to_str(self):
         return str(self.value)
 
 
 class VarCFArgument(CalculationFragmentArgument):
-    type = 'var'
-
     def __init__(self, name, ref):
         self.name = name
         self.ref = ref

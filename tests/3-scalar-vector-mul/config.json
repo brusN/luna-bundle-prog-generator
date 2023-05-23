@@ -1,6 +1,6 @@
 {
-    "bundle_file_path": "bundle.bndl",
-    "luna_src_path": "test.fa",
-    "cpp_codes_path": "ucodes.cpp",
-    "buildOnly": false
-  }
+  "bundle_file_path": "bundle.bndl",
+  "luna_src_path": "test.fa",
+  "cpp_codes_path": "ucodes.cpp",
+  "buildOnly": false
+}

@@ -9,7 +9,7 @@ import c_print_result(value) as print_result;
 
 sub main() {
     df vectorA, vectorAPart, vectorB, vectorBPart, result, resultPart;
-    
+
     cf initVectorA: init_vector(vectorA, 100, 1);
     cf initVectorB: init_vector(vectorB, 100, 2);
 

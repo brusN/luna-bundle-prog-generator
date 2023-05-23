@@ -1,11 +1,11 @@
 #include <iostream>
 #include "ucenv.h"
 
-extern "C" 
+extern "C"
 {
     void c_init_vector(DF& vectorDf, int size, int value) {
         vectorDf.create<int>(size);
-        int* data = (int*)vectorDf.get_data(); 
+        int* data = (int*)vectorDf.get_data();
         for (int i = 0; i < size; ++i) {
             data[i] = value;
         }
@@ -47,7 +47,7 @@ extern "C"
         int scalMulResult = 0;
         for (int i = 0; i < size; ++i) {
             scalMulResult += vector1Data[i] * vector2Data[i];
-        } 
+        }
         result.setValue(scalMulResult);
     }
 

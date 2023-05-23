@@ -11,6 +11,12 @@ public:
     virtual std::string toJSONStruct() = 0;
 };
 
+class IIntExpression {
+public:
+    virtual std::string toJSONStruct() = 0;
+    virtual ~IIntExpression();
+};
+
 class ExecutionContext: public IExecuteSubblock {
 private:
     std::list<IExecuteSubblock*> body;
@@ -24,23 +30,28 @@ public:
 
 class TaskDescriptor {
 private:
-    std::list<std::string> name;
+    std::string baseName;
+    std::list<IIntExpression*> refs;
 
 public:
-    std::list<std::string>& getName();
-    void setName(std::list<std::string> name);
-    void addNamePart(std::string namePart);
+    std::string& getBaseName();
+    void setBaseName(std::string name);
+    std::list<IIntExpression*>& getRefs();
+    void addRef(IIntExpression* ref);
+    std::string toJSONStruct();
 };
 
 class DFDescriptor {
 private:
-    std::list<std::string> name;
+    std::string baseName;
+    std::list<IIntExpression*> refs;
 
 public:
-    std::list<std::string>& getName();
-    void setName(std::list<std::string> name);
-    void addNamePart(std::string namePart);
-    std::string to_cf_json_name();
+    std::string& getBaseName();
+    void setBaseName(std::string name);
+    std::list<IIntExpression*>& getRefs();
+    void addRef(IIntExpression* ref);
+    std::string toJSONStruct();
 };
 
 class UUIDGenerator {
@@ -56,33 +67,30 @@ public:
 
 class RunSubblock: public IExecuteSubblock {
 private:
-    std::string rank;
-    std::list<std::string> cfName;
-
-    std::string buildNameForJSON();
-
+    TaskDescriptor* cf;
+    IIntExpression* rank;
 public:
-    std::string& getRank();
-    void setRank(std::string rank);
+    IIntExpression* getRank();
+    void setRank(IIntExpression* rank);
 
-    std::list<std::string>& getCfName();
-    void setCfName(std::list<std::string> task);
+    void setCf(TaskDescriptor* cf);
+    TaskDescriptor* getCf();
 
     std::string toJSONStruct();
 };
 
 class SendSubblock: public IExecuteSubblock {
 private:
-    std::string fromRank;
-    std::string toRank;
+    IIntExpression* fromRank;
+    IIntExpression* toRank;
     DFDescriptor* dfd;
 
 public:
-    std::string& getFromRank();
-    void setFromRank(std::string fromRank);
+    IIntExpression* getFromRank();
+    void setFromRank(IIntExpression* fromRank);
 
-    std::string& getToRank();
-    void setToRank(std::string toRank);
+    IIntExpression* getToRank();
+    void setToRank(IIntExpression* toRank);
 
     DFDescriptor* getDFD();
     void setDFD(DFDescriptor* dfd);
@@ -105,8 +113,8 @@ class ForSubblock: public IExecuteSubblock {
 private:
     ExecutionContext* body;
     std::string iteratorName;
-    std::string startIndex;
-    std::string endIndex;
+    IIntExpression* startIndex;
+    IIntExpression* endIndex;
 
 public:
     void setBody(ExecutionContext* context);
@@ -115,16 +123,56 @@ public:
     void setIteratorName(std::string iteratorName);
     std::string& getIteratorName();
 
-    void setStartIndex(std::string startIndex);
-    std::string getStartIndex();
+    void setStartIndex(IIntExpression* startIndex);
+    IIntExpression* getStartIndex();
 
-    void setEndIndex(std::string endIndex);
-    std::string getEndIndex();
+    void setEndIndex(IIntExpression* endIndex);
+    IIntExpression* getEndIndex();
 
     std::string toJSONStruct();
 };
 
+// Expressions
 
+class ConstIntExpression: public IIntExpression {
+private:
+    int value;
+public:
+    ConstIntExpression(int value);
+    void setValue(int value);
+    int getValue();
+    std::string toJSONStruct() override;
+    ~ConstIntExpression() override;
+};
+
+class VarIntExpression: public IIntExpression {
+private:
+    std::string name;
+public:
+    VarIntExpression(std::string name);
+    void setName(std::string name);
+    std::string getName();
+    std::string toJSONStruct() override;
+    ~VarIntExpression() override;
+};
+
+class OperationIntExpression: public IIntExpression {
+private:
+    std::string op;
+    IIntExpression* leftOperand;
+    IIntExpression* rightOperand;
+
+public:
+    OperationIntExpression(std::string op, IIntExpression* leftOperand, IIntExpression* rightOperand);
+    void setOperation(std::string op);
+    std::string getOperation();
+    void setLeftOperand(IIntExpression* operand);
+    IIntExpression* getLeftOperand();
+    void setRightOperand(IIntExpression* operand);
+    IIntExpression* getRightOperand();
+    std::string toJSONStruct();
+    ~OperationIntExpression();
+};
 
 class BundleContainer {
 private:
@@ -133,6 +181,7 @@ private:
     std::map<std::string, TaskDescriptor*> tasks;
     std::map<std::string, ExecutionContext*> contexts;
     std::map<std::string, DFDescriptor*> dfs;
+    std::map<std::string, IIntExpression*> expressions;
 
     // Memory will be cleared with other contexts
     ExecutionContext* mainContext;
@@ -156,6 +205,9 @@ public:
 
     std::string registerNewDFD(DFDescriptor* dfd);
     DFDescriptor* getDFDByUUID(std::string uuid);
+
+    std::string registerNewExpression(IIntExpression* expression);
+    IIntExpression* getExpressionByUUID(std::string uuid);
 
     ~BundleContainer();
 };

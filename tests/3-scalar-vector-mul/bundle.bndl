@@ -9,7 +9,7 @@ execution {
     define df vectorBPart;
     define df result;
     define df resultPart;
-    
+
     run initVectorA on rank 0;
     run initVectorB on rank 0;
 
