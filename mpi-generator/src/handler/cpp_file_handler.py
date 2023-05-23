@@ -65,25 +65,9 @@ class CPPFileHandler:
         cpp_list_define = f'"{df_name[0]}" '
         for df_name_part in df_name[1:]:
             cpp_list_define += f', "{df_name_part}"'
-        temp_ref_name = 'requiredDFForSend'
-        self.write_line(f'\
-        if (rank == {from_rank}) {{ \
-            DF* {temp_ref_name} = dfManager.getDFByFullName({{ {cpp_list_define} }}); \
-            void * {temp_ref_name}_buff = malloc({temp_ref_name}->get_serialization_size()); \
-            {temp_ref_name}->serialize({temp_ref_name}_buff, {temp_ref_name}->get_serialization_size()); \
-            MPI_Send({temp_ref_name}_buff, {temp_ref_name}->get_serialization_size(), MPI_BYTE, {to_rank}, 0, MPI_COMM_WORLD); \
-            free({temp_ref_name}_buff); \
-        }} else if (rank == {to_rank}) {{ \
-            DF* {temp_ref_name} = dfManager.getDFByFullName({{ {cpp_list_define} }}); \
-            MPI_Status status; \
-            MPI_Probe(0, 0, MPI_COMM_WORLD, &status); \
-            int serializationSize; \
-            MPI_Get_count(&status, MPI_BYTE, &serializationSize); \
-            void * buff = malloc({temp_ref_name}->get_serialization_size()); \
-            MPI_Recv(buff, serializationSize, MPI_BYTE, {from_rank}, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
-            {temp_ref_name}->deserialize(buff, serializationSize); \
-            free(buff); \
-        }}')
+        self.write_line(f' \
+            dfManager.sendDfBetweenNodes({{ {cpp_list_define} }}, rank, {from_rank}, {to_rank}); \
+        ')
 
     def finalize(self):
         self._file.close()

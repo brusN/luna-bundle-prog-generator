@@ -78,6 +78,24 @@ DF *DFManager::getDFByFullName(std::list<std::string> name) {
     return ptr;
 }
 
-void DFManager::sendDfBetweenNodes(std::list<std::string> dfName, int senderRank, int receiverRank) {
-
+void DFManager::sendDfBetweenNodes(std::list<std::string> dfName, int rank, int senderRank, int receiverRank) {
+    int tag = ++tagCounter;
+    if (rank == senderRank) {
+        DF* df = getDFByFullName(dfName);
+        size_t serializationSize = df->get_serialization_size();
+        void* buff = malloc(serializationSize);
+        df->serialize(buff, serializationSize);
+        MPI_Send(buff, serializationSize, MPI_BYTE, receiverRank, tag, MPI_COMM_WORLD);
+        free(buff);
+    } else if (rank == receiverRank) {
+        DF* df = getDFByFullName(dfName);
+        MPI_Status status;
+        MPI_Probe(senderRank, tag, MPI_COMM_WORLD, &status);
+        int serializationSize;
+        MPI_Get_count(&status, MPI_BYTE, &serializationSize);
+        void* buff = malloc(serializationSize);
+        MPI_Recv(buff, serializationSize, MPI_BYTE, senderRank, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        df->deserialize(buff, serializationSize);
+        free(buff);
+    }
 }

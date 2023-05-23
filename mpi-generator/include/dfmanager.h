@@ -2,9 +2,11 @@
 #define LUNA_TEST_MANAGER_H
 
 #include <iostream>
+#include <mpi.h>
 #include <string>
 #include <list>
 #include <map>
+#include <atomic>
 #include "df.h"
 
 class DFDescriptor {
@@ -32,12 +34,13 @@ public:
 class DFManager {
 private:
     std::map<std::string, DFDescriptor *> dfDescriptors;
+    std::atomic<int> tagCounter = 0;
 public:
     void addNewDF(DFDescriptor* dfDescriptor);
     DFDescriptor* getDFDescriptor(std::string dfName);
     void addRefToDF(std::string dfName, std::list<std::string> ref);
     DF* getDFByFullName(std::list<std::string> name);
-    void sendDfBetweenNodes(std::list<std::string> dfName, int senderRank, int receiverRank);
+    void sendDfBetweenNodes(std::list<std::string> dfName, int rank, int senderRank, int receiverRank);
     ~DFManager();
 };
 

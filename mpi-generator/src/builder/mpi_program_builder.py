@@ -72,7 +72,6 @@ class MPIProgramBuilder:
             raise OsCommandExecutionException('Error while parsing bundle file')
 
     def _include_headers(self):
-        self._cpp_file_handler.include_std_header(self.build_config.mpi_header)
         self._cpp_file_handler.include_std_header('dfmanager.h')
 
     def _include_extern_code_blocks(self):
@@ -141,7 +140,6 @@ class MPIProgramBuilder:
                 MPI_Init(&argc, &argv); \
                 MPI_Comm_rank(MPI_COMM_WORLD, &rank); \
                 MPI_Comm_size(MPI_COMM_WORLD, &size); \
-                printf(\"%d, %d\\n\", rank, size); \
                 DFManager dfManager; \
             ')
 
