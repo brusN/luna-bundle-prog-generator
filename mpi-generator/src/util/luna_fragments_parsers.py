@@ -63,11 +63,19 @@ class CalculationFragmentHandler:
         for arg in cf_block_json['args']:
             match arg['type']:
                 case 'iconst':
-                    args.append(IConstCFArgument(arg['value']))
+                    args.append(IConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
                 case 'rconst':
-                    args.append(RConstCFArgument(arg['value']))
+                    args.append(RConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
                 case 'sconst':
-                    args.append(SConstCFArgument(arg['value']))
+                    args.append(SConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
+                case '+':
+                    args.append(RConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
+                case '-':
+                    args.append(RConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
+                case '*':
+                    args.append(RConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
+                case '/':
+                    args.append(RConstCFArgument(LunaExpressionParser.get_unwrapped_value(arg, iterator_context)))
                 case 'id':
                     possible_iter_name = arg['ref'][0]
                     if iterator_context.is_contains_iterator(possible_iter_name):
