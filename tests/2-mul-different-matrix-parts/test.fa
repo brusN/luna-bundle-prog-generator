@@ -1,0 +1,31 @@
+import c_initMatrixPart(name, int, int, int) as initMatrixPart;
+import c_multiplyMatrixParts(value, int, int, value, int, int, name) as multiplyMatrixParts;
+import c_printMatrixPart(value, int, int) as printMatrixPart;
+
+sub main() {
+    df matrixA, matrixB, resultMatrix;
+    for i=1..6 {
+        for j=0..9 {
+            cf initMatrixA[i][j]: initMatrixPart(matrixA[i][j], 2000, 1000, 1) @ {
+            	locator_cyclic: i;
+            };
+            cf initMatrixB[i][j]: initMatrixPart(matrixB[i][j], 1000, 2000, 1) @ {
+            	locator_cyclic: i;
+            };
+            cf mulMatrixs[i][j]: multiplyMatrixParts(matrixA[i][j], 2000, 1000, matrixB[i][j], 1000, 1000, resultMatrix[i][j]) @ {
+            	locator_cyclic: i;
+            };
+        }
+        for j=10..49 {
+            cf initMatrixA[i][j]: initMatrixPart(matrixA[i][j], 1000, 1000, 1) @ {
+            	locator_cyclic: i;
+            };
+            cf initMatrixB[i][j]: initMatrixPart(matrixB[i][j], 1000, 1000, 1) @ {
+            	locator_cyclic: i;
+            };
+            cf mulMatrixs[i][j]: multiplyMatrixParts(matrixA[i][j], 1000, 1000, matrixB[i][j], 1000, 1000, resultMatrix[i][j]) @ {
+            	locator_cyclic: i;
+            };
+        }
+    }
+}

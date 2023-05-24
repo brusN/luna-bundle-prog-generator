@@ -5,6 +5,9 @@ import os
 from exception.custom_exceptions import OsCommandExecutionException
 from handler.cpp_file_handler import CPPFileHandler
 from handler.program_recom_handler import IteratorContext, IteratorDescriptor, ProgramRecomHandler
+from exception.custom_exceptions import MultiplyCfDescriptorsException, CfNotFoundException
+from util.bundle_blocks_parser import BundleControlUnitParser
+from util.ref_expr_parsers import BundleIntExpressionParser
 
 
 class MPIProgramBuilder:
@@ -25,7 +28,6 @@ class MPIProgramBuilder:
         self._luna_fragments = None
         self._program_recom_handler = ProgramRecomHandler(luna_build_dir=luna_build_dir)
 
-        logging.debug('Working directory is ' + os.getcwd())
         self._create_build_folders()
         self._cpp_file_handler = CPPFileHandler(file_name=f'{build_dir}/luna_manual_mpi_program_src.cpp')
         self._bundle_json_file_path = f'{self._build_dir}/bundle.json'
@@ -34,7 +36,6 @@ class MPIProgramBuilder:
         self._compile_luna_prog()
         self._get_bundle_json()
         self._luna_fragments = self._program_recom_handler.parse_program_recom_json()
-
         logging.debug('Luna fragments parsing has finished')
         self._generate_mpi_src()
 
@@ -71,15 +72,14 @@ class MPIProgramBuilder:
             raise OsCommandExecutionException('Error while parsing bundle file')
 
     def _include_headers(self):
-        self._cpp_file_handler.include_std_header(self.build_config.mpi_header)
         self._cpp_file_handler.include_std_header('dfmanager.h')
 
     def _include_extern_code_blocks(self):
         for code_fragment in self._luna_fragments.code_fragments:
             self._cpp_file_handler.include_extern_void_func(self._luna_fragments.code_fragments[code_fragment])
 
-    def _generate_define_df(self, df_name):
-        self._cpp_file_handler.include_define_df(df_name)
+    def _generate_define_df(self, df):
+        self._cpp_file_handler.include_define_df(df)
 
     def _generate_exec_cf(self, cf, rank):
         self._cpp_file_handler.include_cf_execution(cf, self._luna_fragments.code_fragments[cf.code], rank)
@@ -88,58 +88,25 @@ class MPIProgramBuilder:
         self._cpp_file_handler.include_df_send(df_name, from_rank, to_rank)
 
     def _handle_for_loop(self, block, iterator_context):
-        iterator_context.add_iterator(
-            IteratorDescriptor(block['iterator'], int(block['startValue']), int(block['endValue'])))
+        start_value = BundleIntExpressionParser.get_unwrapped_value(block['startValue'], iterator_context)
+        end_value = BundleIntExpressionParser.get_unwrapped_value(block['endValue'], iterator_context)
+        it_name = block['iterator']
+        iterator_context.add_iterator(IteratorDescriptor(it_name, start_value, end_value))
         cur_iter_values = iterator_context.get_cur_iter_values()
         cartesian_size = iterator_context.get_cartesian_size()
-        for i in range(int(block['startValue']), int(block['endValue']) + 1):
+        for i in range(start_value, end_value + 1):
             for exec_block in block['body']:
                 match exec_block['type']:
                     case 'run':
-                        # Building cf name, replace iterator by their cur value, if can
-                        cf_full_name = [exec_block['cf'][0]]
-                        for cf_name_part in exec_block['cf'][1:]:
-                            if cf_name_part in iterator_context.iterators:
-                                cf_full_name.append(iterator_context.iterators[cf_name_part].cur_value)
-                            else:
-                                cf_full_name.append(int(cf_name_part))
-
-                        # Find linked cf with described in bundle
-                        filtered_list = {}
-                        for it in self._luna_fragments.calculation_fragments:
-                            if it.name == cf_full_name[0] and it.ref == cf_full_name[1:]:
-                                filtered_list = it
-                                break
-
-                        # Replace iterator by his cur value, if can
-                        if exec_block['rank'] in iterator_context.iterators:
-                            rank = iterator_context.iterators[exec_block['rank']].cur_value
-                        else:
-                            rank = int(exec_block['rank'])
-
-                        self._generate_exec_cf(filtered_list, rank)
+                        built_cf_name = BundleControlUnitParser.build_full_cf_name(exec_block['cf'], iterator_context)
+                        cf = self._luna_fragments.get_cf(built_cf_name)
+                        rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['rank'], iterator_context)
+                        self._generate_exec_cf(cf, rank)
                     case 'send':
-                        # Replace iterator by his cur value, if can for from field
-                        if exec_block['from'] in iterator_context.iterators:
-                            from_value = iterator_context.iterators[exec_block['from']].cur_value
-                        else:
-                            from_value = int(exec_block['from'])
-
-                        # Replace iterator by his cur value, if can for to field
-                        if exec_block['to'] in iterator_context.iterators:
-                            to_value = iterator_context.iterators[exec_block['to'].cur_value]
-                        else:
-                            to_value = int(exec_block['to'])
-
-                        # Building df name, replace iterator by their cur value, if can
-                        df_name = [exec_block['data'][0]]
-                        for df_name_part in exec_block['data'][1:]:
-                            if df_name_part in iterator_context.iterators:
-                                df_name.append(iterator_context.iterators[df_name_part].cur_value)
-                            else:
-                                df_name.append(int(df_name_part))
-
-                        self._generate_send_df(df_name, from_value, to_value)
+                        from_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['from'], iterator_context)
+                        to_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['to'], iterator_context)
+                        built_df_name = BundleControlUnitParser.build_full_df_name(exec_block['data'], iterator_context)
+                        self._generate_send_df(built_df_name, from_rank, to_rank)
                     case 'for':
                         self._handle_for_loop(exec_block, iterator_context)
             if cartesian_size > 1:
@@ -151,19 +118,17 @@ class MPIProgramBuilder:
         for exec_block in body:
             match exec_block['type']:
                 case 'df':
-                    self._generate_define_df(exec_block['name'])
+                    df = self._luna_fragments.get_df(exec_block['name'])
+                    self._generate_define_df(df)
                 case 'run':
-                    cf_full_name = [exec_block['cf'][0]]
-                    for cf_name_part in exec_block['cf'][1:]:
-                        cf_full_name.append(int(cf_name_part))
-                    filtered_list = {}
-                    for it in self._luna_fragments.calculation_fragments:
-                        if it.name == cf_full_name[0] and it.ref == cf_full_name[1:]:
-                            filtered_list = it
-                            break
-                    self._generate_exec_cf(filtered_list, exec_block['rank'])
+                    built_cf_name = BundleControlUnitParser.build_full_cf_name(exec_block['cf'], iterator_context)
+                    cf = self._luna_fragments.get_cf(built_cf_name)
+                    rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['rank'], iterator_context)
+                    self._generate_exec_cf(cf, rank)
                 case 'send':
-                    self._generate_send_df(exec_block['data'], exec_block['from'], exec_block['to'])
+                    from_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['from'], iterator_context)
+                    to_rank = BundleIntExpressionParser.get_unwrapped_value(exec_block['to'], iterator_context)
+                    self._generate_send_df(exec_block['data'], from_rank, to_rank)
                 case 'for':
                     self._handle_for_loop(exec_block, iterator_context)
 

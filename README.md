@@ -6,6 +6,6 @@
 
 # Ссылки
 
-[Документация](docs/documentation.md)
+[Документация](docs/user-guide.md)
 
 [Репозиторий LuNA на Gitlab](https://gitlab.ssd.sscc.ru/luna/luna)
