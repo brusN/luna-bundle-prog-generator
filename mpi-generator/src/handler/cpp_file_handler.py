@@ -23,21 +23,39 @@ class CPPFileHandler:
         self._file.write(f'extern "C" void {code_fragment.code}({args});')
         self.write_empty_line()
 
-    def include_define_df(self, df_name):
+    def include_define_df(self, df):
         self.write_line(f' \
-            dfManager.addNewDF(new DFDescriptor("{df_name}")); \
+            dfManager.addNewDF(new DFDescriptor("{df.name}")); \
         ')
+
+        # if len(df.refs) < 1:
+        #     return
+        #
+        # for ref in df.refs:
+        #     ref_list = "{ "
+        #     for ref_part in ref:
+        #         ref_list += f'"{ref_part}", '
+        #     ref_list = ref_list[:-2]
+        #     ref_list += "}"
+        #     self.write_line(f' \
+        #         dfManager.addRefToDF("{df.name}", {ref_list}); \
+        #     ')
 
     def include_cf_execution(self, calculation_fragment, code_fragment, rank):
         args = ''
         for arg in calculation_fragment.args:
-            if arg.type == 'const':
-                args += str(arg.value) + ', '
-            elif arg.type == 'var':
-                cpp_list_define = f'"{arg.name}"'
-                for cf_ref_part in arg.ref:
-                    cpp_list_define += f', "{cf_ref_part}"'
-                args += f'*dfManager.getDFByFullName({{ {cpp_list_define} }}), '
+            match arg.type:
+                case 'iconst':
+                    args += str(arg.value) + ', '
+                case 'rconst':
+                    args += str(arg.value) + ', '
+                case 'sconst':
+                    args += f'\"{arg.value}\", '
+                case 'var':
+                    cpp_list_define = f'"{arg.name}"'
+                    for cf_ref_part in arg.ref:
+                        cpp_list_define += f', "{cf_ref_part}"'
+                    args += f'*dfManager.getDFByFullName({{ {cpp_list_define} }}), '
         args = args[:-2]
         self.write_line(f'if (rank == {rank}) {{ \
             {code_fragment.code}({args}); \
@@ -47,25 +65,9 @@ class CPPFileHandler:
         cpp_list_define = f'"{df_name[0]}" '
         for df_name_part in df_name[1:]:
             cpp_list_define += f', "{df_name_part}"'
-        temp_ref_name = 'requiredDFForSend'
-        self.write_line(f'\
-        if (rank == {from_rank}) {{ \
-            DF* {temp_ref_name} = dfManager.getDFByFullName({{ {cpp_list_define} }}); \
-            void * {temp_ref_name}_buff = malloc({temp_ref_name}->get_serialization_size()); \
-            {temp_ref_name}->serialize({temp_ref_name}_buff, {temp_ref_name}->get_serialization_size()); \
-            MPI_Send({temp_ref_name}_buff, {temp_ref_name}->get_serialization_size(), MPI_BYTE, 1, {from_rank}, MPI_COMM_WORLD); \
-            free({temp_ref_name}_buff); \
-        }} else if (rank == {to_rank}) {{ \
-            DF* {temp_ref_name} = dfManager.getDFByFullName({{ {cpp_list_define} }}); \
-            MPI_Status status; \
-            MPI_Probe(0, 0, MPI_COMM_WORLD, &status); \
-            int serializationSize; \
-            MPI_Get_count(&status, MPI_BYTE, &serializationSize); \
-            void * buff = malloc({temp_ref_name}->get_serialization_size()); \
-            MPI_Recv(buff, serializationSize, MPI_BYTE, 0, {from_rank}, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
-            {temp_ref_name}->deserialize(buff, serializationSize); \
-            free(buff); \
-        }}')
+        self.write_line(f' \
+            dfManager.sendDfBetweenNodes({{ {cpp_list_define} }}, rank, {from_rank}, {to_rank}); \
+        ')
 
     def finalize(self):
         self._file.close()

@@ -1,0 +1,30 @@
+define {
+    N = 5;
+}
+
+execution {
+    define df vectorA;
+    define df vectorB;
+    define df vectorAPart;
+    define df vectorBPart;
+    define df result;
+    define df resultPart;
+
+    run initVectorA on rank 0;
+    run initVectorB on rank 0;
+
+    for i=1..$N {
+        run getVectorAPart[i] on rank 0;
+        run getVectorBPart[i] on rank 0;
+        send vectorAPart[i] from 0 to i;
+        send vectorBPart[i] from 0 to i;
+        run scalar_mul_vector_parts[i] on rank i;
+        send resultPart[i] from i to 0;
+    }
+
+    run initResult on rank 0;
+    for i=1..$N {
+        run collect_result_parts[i] on rank 0;
+    }
+    run printResult on rank 0;
+}

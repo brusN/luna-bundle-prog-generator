@@ -1,6 +1,8 @@
+import logging
+
 from builder.mpi_program_compiler import MPIProgramCompiler
-from config.build_config_parser import *
-from builder.mpi_program_builder import *
+from builder.mpi_program_builder import MPIProgramBuilder
+from config.build_config_parser import BuildConfigParser, PropertyNotDefinedError
 
 logging.basicConfig(level=logging.DEBUG, format='luna-mpi-generator: [%(levelname)-s]\t%(message)-s')
 

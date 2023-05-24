@@ -3,3 +3,5 @@ build/
 test/
 .vscode/
 .idea/
+tests/*/build
+tests/*/luna_compile_temp
