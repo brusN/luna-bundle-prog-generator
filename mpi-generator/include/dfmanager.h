@@ -34,7 +34,7 @@ public:
 class DFManager {
 private:
     std::map<std::string, DFDescriptor *> dfDescriptors;
-    std::atomic<int> tagCounter = 0;
+    std::atomic<int> tagCounter{0};
 public:
     void addNewDF(DFDescriptor* dfDescriptor);
     DFDescriptor* getDFDescriptor(std::string dfName);

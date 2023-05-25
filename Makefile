@@ -29,15 +29,15 @@ $(TARGET_PARSER): $(OBJ_CPP) $(BIN_DIR) $(BUILD_DIR)lexer.o $(BUILD_DIR)grammar.
 
 ## Compiling c++ files to object files
 $(BUILD_DIR)%.o: $(PREF_CPP_SRC)%.cpp $(BUILD_DIR)
-	$(CC) -c $< -o $@
+	$(CC) -c $< -o $@ -std=c++11
 
 
 # Compiling flex and bison files
 $(BUILD_DIR)lexer.o: $(PREF_CPP_SRC)lexer.c $(BUILD_DIR)
-	$(CC) -c $(PREF_CPP_SRC)lexer.c -o $(BUILD_DIR)lexer.o
+	$(CC) -c $(PREF_CPP_SRC)lexer.c -o $(BUILD_DIR)lexer.o -std=c++11
 
 $(BUILD_DIR)grammar.o: $(PREF_CPP_SRC)grammar.cpp $(BUILD_DIR)
-	$(CC) -c $(PREF_CPP_SRC)grammar.cpp -o $(BUILD_DIR)grammar.o
+	$(CC) -c $(PREF_CPP_SRC)grammar.cpp -o $(BUILD_DIR)grammar.o -std=c++11
 
 $(PREF_CPP_SRC)lexer.c: $(PREF_CPP_SRC)lexer.l $(PREF_CPP_SRC)grammar.cpp $(PREF_CPP_SRC)grammar.hpp
 	$(LEX_CC) -o $(PREF_CPP_SRC)lexer.c $(PREF_CPP_SRC)lexer.l

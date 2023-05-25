@@ -33,7 +33,7 @@ void DFDescriptor::setDFRefValue(std::list<std::string> refName, DF *value) {
 
 DFDescriptor::~DFDescriptor() {
     delete baseValue;
-    for (auto ref: this->refs) {
+    for (auto& ref: this->refs) {
         delete ref.second;
     }
 }
@@ -53,7 +53,7 @@ DFDescriptor* DFManager::getDFDescriptor(std::string dfName) {
 }
 
 DFManager::~DFManager() {
-    for (auto df: this->dfDescriptors) {
+    for (auto& df: this->dfDescriptors) {
         delete df.second;
     }
 }
@@ -64,7 +64,7 @@ void DFManager::addRefToDF(std::string dfName, std::list<std::string> ref) {
 }
 
 DF *DFManager::getDFByFullName(std::list<std::string> name) {
-    auto dfd = this->dfDescriptors.find(name.front())->second;
+    DFDescriptor* dfd = this->dfDescriptors.find(name.front())->second;
     DF* ptr;
     if (name.size() == 1) {
         ptr = dfd->getBaseValue();

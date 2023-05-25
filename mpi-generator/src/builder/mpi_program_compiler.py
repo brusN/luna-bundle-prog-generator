@@ -22,8 +22,7 @@ class MPIProgramCompiler(IProgramCompiler):
         bundle_lib_src_headers_path = self._bundle_home_path + '/mpi-generator/include'
 
         # Include luna src headers
-        os.system('clang-format -style=Google -i build/luna_manual_mpi_program_src.cpp')
-        os_command = f'{self._mpi_compiler} -O3 build/luna_manual_mpi_program_src.cpp {ucodes_cpp} -I {luna_src_headers_path} -I {bundle_lib_src_headers_path} '
+        os_command = f'{self._mpi_compiler} -O3 -std=c++11 build/luna_manual_mpi_program_src.cpp {ucodes_cpp} -I {luna_src_headers_path} -I {bundle_lib_src_headers_path} '
 
         # Including luna src dependencies
         luna_source_dependencies = {'df.cpp', 'common.cpp', 'serializable.cpp'}
