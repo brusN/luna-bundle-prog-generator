@@ -7,6 +7,8 @@ from util.luna_fragments_parsers import CalculationFragmentHandler, CodeFragment
 from util.ref_expr_parsers import LunaExpressionParser
 from exception.custom_exceptions import CfNotFoundException, MultiplyCfDescriptorsException, DfNotFoundException
 
+from src.exception.custom_exceptions import IteratorNotFoundInContextException, MultiplyIteratorInContextException
+
 
 # Stores parsed fragments from program_recom.ja file
 class LunaFragments:
@@ -105,6 +107,17 @@ class IteratorContext:
                     cur_iter_values[i - 1].value += 1
                 else:
                     break
+
+    def inc_iterator(self, it_name, cur_iter_values):
+        filtered_list = []
+        for it in cur_iter_values:
+            if it.name == it_name:
+                it.value += 1
+                filtered_list.append(it)
+        if len(filtered_list) == 0:
+            raise IteratorNotFoundInContextException(f'No found iterator with name {it_name}')
+        if len(filtered_list) > 1:
+            raise MultiplyIteratorInContextException(f'Iterator {it_name} has multiply descriptors')
 
     def is_contains_iterator(self, it_name):
         return it_name in self.iterators

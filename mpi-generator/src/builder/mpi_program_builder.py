@@ -93,7 +93,6 @@ class MPIProgramBuilder:
         it_name = block['iterator']
         iterator_context.add_iterator(IteratorDescriptor(it_name, start_value, end_value))
         cur_iter_values = iterator_context.get_cur_iter_values()
-        cartesian_size = iterator_context.get_cartesian_size()
         for i in range(start_value, end_value + 1):
             for exec_block in block['body']:
                 match exec_block['type']:
@@ -109,10 +108,9 @@ class MPIProgramBuilder:
                         self._generate_send_df(built_df_name, from_rank, to_rank)
                     case 'for':
                         self._handle_for_loop(exec_block, iterator_context)
-            if cartesian_size > 1:
-                iterator_context.inc_cur_iter_values(cur_iter_values)
-                iterator_context.update_cur_iter_values(cur_iter_values)
-        iterator_context.remove_iterator(block['iterator'])
+            iterator_context.inc_iterator(it_name, cur_iter_values)
+            iterator_context.update_cur_iter_values(cur_iter_values)
+        iterator_context.remove_iterator(it_name)
 
     def _handle_exec_context(self, body, iterator_context):
         for exec_block in body:

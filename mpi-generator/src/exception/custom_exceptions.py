@@ -32,3 +32,9 @@ class MultiplyCfDescriptorsException(Exception):
 
 class DfNotFoundException(Exception):
     pass
+
+class MultiplyIteratorInContextException(Exception):
+    pass
+
+class IteratorNotFoundInContextException(Exception):
+    pass
