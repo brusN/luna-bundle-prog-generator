@@ -7,7 +7,7 @@ from util.luna_fragments_parsers import CalculationFragmentHandler, CodeFragment
 from util.ref_expr_parsers import LunaExpressionParser
 from exception.custom_exceptions import CfNotFoundException, MultiplyCfDescriptorsException, DfNotFoundException
 
-from src.exception.custom_exceptions import IteratorNotFoundInContextException, MultiplyIteratorInContextException
+from exception.custom_exceptions import IteratorNotFoundInContextException, MultiplyIteratorInContextException
 
 
 # Stores parsed fragments from program_recom.ja file
